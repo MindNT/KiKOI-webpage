@@ -12,22 +12,34 @@
       "src": "logo192.png",
       "type": "image/png",
       "sizes": "192x192",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "logo192.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "maskable"
     },
     {
       "src": "logo512.png",
       "type": "image/png",
       "sizes": "512x512",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "logo512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "maskable"
     }
   ],
-  "start_url": "/",
+  "start_url": "/KiKOI-webpage/",
   "display": "standalone",
   "orientation": "portrait-primary",
   "theme_color": "#1f2937",
   "background_color": "#ffffff",
   "categories": ["food", "coffee", "restaurant", "cafe"],
   "lang": "es-MX",
-  "scope": "/",
+  "scope": "/KiKOI-webpage/",
   "id": "kikoi-cafeteria"
 }
