@@ -5,6 +5,13 @@ export const useCartStore = create((set, get) => ({
   setCartOpen: (open) => set({ cartOpen: open }),
   cart: [],
   cartTotal: 0,
+  // Estados para el modal de éxito
+  showSuccess: false,
+  orderData: null,
+  customerName: '',
+  setShowSuccess: (show) => set({ showSuccess: show }),
+  setOrderData: (data) => set({ orderData: data }),
+  setCustomerName: (name) => set({ customerName: name }),
   addToCart: (item) => {
     const cart = get().cart;
     const existing = cart.find(p => p.id === item.id);
@@ -23,5 +30,13 @@ export const useCartStore = create((set, get) => ({
       .filter(item => item.qty > 0);
     const total = cart.reduce((sum, i) => sum + i.price * i.qty, 0);
     set({ cart, cartTotal: total });
+  },
+  removeFromCart: (id) => {
+    const cart = get().cart.filter(item => item.id !== id);
+    const total = cart.reduce((sum, i) => sum + i.price * i.qty, 0);
+    set({ cart, cartTotal: total });
+  },
+  clearCart: () => {
+    set({ cart: [], cartTotal: 0 });
   },
 }));
