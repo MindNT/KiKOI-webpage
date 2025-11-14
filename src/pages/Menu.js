@@ -104,37 +104,60 @@ const Menu = () => {
                );
        };
 
-       // Fetch categorías y productos al montar el componente
-       useEffect(() => {
-	       // Obtener categorías
+       // Función para obtener la fecha formateada
+       const getFormattedDate = () => {
+	       const today = new Date();
+	       const year = today.getFullYear();
+	       const month = String(today.getMonth() + 1).padStart(2, '0');
+	       const day = String(today.getDate()).padStart(2, '0');
+	       return `${year}-${month}-${day}`;
+       };
+
+       // Función para obtener productos
+       const fetchMenuItems = () => {
+	       const formattedDate = getFormattedDate();
+	       fetch(`https://kikoi-management.mindnt.com.mx/items/get-items-day?day=${formattedDate}`)
+		       .then(res => res.json())
+		       .then(data => {
+			       if (data.status === 'success' && Array.isArray(data.data)) {
+				       // Normalizar los nombres de las propiedades del backend
+				       const normalizedItems = data.data.map(item => ({
+					       ...item,
+					       name: item.Nombre || item.name,
+					       atributo_1: item.Atributo_1 || item.atributo_1,
+					       atributo_2: item.Atributo_2 || item.atributo_2
+				       }));
+				       setMenuItems(normalizedItems);
+			       }
+		       })
+		       .catch(err => console.error('Error al obtener items:', err));
+       };
+
+       // Función para obtener categorías
+       const fetchCategories = () => {
 	       fetch('https://kikoi-management.mindnt.com.mx/items/categories')
 		       .then(res => res.json())
 		       .then(data => {
 			       if (data.status === 'success' && Array.isArray(data.data)) {
 				       setCategories(data.data.filter(cat => cat.is_active));
 			       }
-		       });
-	       // Obtener productos del día actual
-	       const today = new Date();
-	       const formattedDate = today.toISOString().split('T')[0]; // Formato YYYY-MM-DD
-	       fetch(`https://kikoi-management.mindnt.com.mx/items/get-items-day?day=${formattedDate}`)
-		       .then(res => res.json())
-		       .then(data => {
-			       if (data.status === 'success' && Array.isArray(data.data)) {
-				       // Normalizar los nombres de las propiedades del backend
-				       const normalizedItems = data.data.map(item => {
-					       console.log('Item original:', item); // Debug
-					       return {
-						       ...item,
-						       name: item.Nombre || item.name,
-						       atributo_1: item.Atributo_1 || item.atributo_1,
-						       atributo_2: item.Atributo_2 || item.atributo_2
-					       };
-				       });
-				       console.log('Items normalizados:', normalizedItems); // Debug
-				       setMenuItems(normalizedItems);
-			       }
-		       });
+		       })
+		       .catch(err => console.error('Error al obtener categorías:', err));
+       };
+
+       // Fetch inicial y polling cada 3 segundos
+       useEffect(() => {
+	       // Carga inicial
+	       fetchCategories();
+	       fetchMenuItems();
+	       
+	       // Polling cada 3 segundos para productos (actualización silenciosa)
+	       const intervalId = setInterval(() => {
+		       fetchMenuItems();
+	       }, 3000);
+	       
+	       // Limpiar el intervalo al desmontar
+	       return () => clearInterval(intervalId);
        }, []);
 
        return (
