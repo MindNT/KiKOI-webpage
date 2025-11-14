@@ -114,12 +114,25 @@ const Menu = () => {
 				       setCategories(data.data.filter(cat => cat.is_active));
 			       }
 		       });
-	       // Obtener productos
-	       fetch('https://kikoi-management.mindnt.com.mx/items/get-items')
+	       // Obtener productos del día actual
+	       const today = new Date();
+	       const formattedDate = today.toISOString().split('T')[0]; // Formato YYYY-MM-DD
+	       fetch(`https://kikoi-management.mindnt.com.mx/items/get-items-day?day=${formattedDate}`)
 		       .then(res => res.json())
 		       .then(data => {
 			       if (data.status === 'success' && Array.isArray(data.data)) {
-				       setMenuItems(data.data);
+				       // Normalizar los nombres de las propiedades del backend
+				       const normalizedItems = data.data.map(item => {
+					       console.log('Item original:', item); // Debug
+					       return {
+						       ...item,
+						       name: item.Nombre || item.name,
+						       atributo_1: item.Atributo_1 || item.atributo_1,
+						       atributo_2: item.Atributo_2 || item.atributo_2
+					       };
+				       });
+				       console.log('Items normalizados:', normalizedItems); // Debug
+				       setMenuItems(normalizedItems);
 			       }
 		       });
        }, []);
