@@ -4,11 +4,28 @@ import { useLocation } from 'wouter';
 const ModalSuccessMobile = ({ isOpen, orderData, customerName, onClose }) => {
   const [, setLocation] = useLocation();
   const [showAnimation, setShowAnimation] = useState(false);
+  const [preparationTime, setPreparationTime] = useState(null);
+  const [preparationMessage, setPreparationMessage] = useState('');
 
   useEffect(() => {
     if (isOpen) {
       // Timing preciso y directo - Principios Ive: simplicidad
       setTimeout(() => setShowAnimation(true), 50);
+
+      // Fetch preparation time
+      fetch('https://kikoi-management.mindnt.com.mx/settings/preparation-time')
+        .then(response => response.json())
+        .then(data => {
+          if (data.status === 'success') {
+            setPreparationTime(data.data.preparation_time);
+            setPreparationMessage(data.data.message);
+          }
+        })
+        .catch(error => {
+          console.error('Error fetching preparation time:', error);
+          // Fallback message
+          setPreparationMessage('Tu pedido está siendo preparado en KiKOI.');
+        });
     } else {
       setShowAnimation(false);
     }
@@ -24,40 +41,38 @@ const ModalSuccessMobile = ({ isOpen, orderData, customerName, onClose }) => {
   return (
     <div className="fixed inset-0 z-[200] overflow-hidden">
       {/* Fondo elegante - Minimalismo de Ive */}
-      <div 
-        className={`absolute inset-0 transition-all duration-700 ease-out ${
-          showAnimation ? 'opacity-100' : 'opacity-0'
-        }`}
+      <div
+        className={`absolute inset-0 transition-all duration-700 ease-out ${showAnimation ? 'opacity-100' : 'opacity-0'
+          }`}
         style={{
           background: 'rgba(0, 0, 0, 0.85)',
           backdropFilter: 'blur(20px) saturate(1.8)',
           WebkitBackdropFilter: 'blur(20px) saturate(1.8)'
         }}
       />
-      
+
       {/* Modal Content - Diseño vertical para móvil */}
-      <div className={`relative z-10 h-full flex flex-col transition-all duration-500 delay-300 ${
-        showAnimation ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
-      }`}>
+      <div className={`relative z-10 h-full flex flex-col transition-all duration-500 delay-300 ${showAnimation ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+        }`}>
         <div className="bg-white h-full flex flex-col overflow-hidden"
-             style={{ 
-               borderTopLeftRadius: '24px',
-               borderTopRightRadius: '24px',
-               marginTop: '8vh',
-               boxShadow: '0 -10px 25px rgba(0, 0, 0, 0.2)',
-               border: '1px solid rgba(255, 255, 255, 0.1)'
-             }}>
-          
+          style={{
+            borderTopLeftRadius: '24px',
+            borderTopRightRadius: '24px',
+            marginTop: '8vh',
+            boxShadow: '0 -10px 25px rgba(0, 0, 0, 0.2)',
+            border: '1px solid rgba(255, 255, 255, 0.1)'
+          }}>
+
           {/* Header fijo - Limpio y funcional */}
           <div className="bg-white text-center px-6 pt-8 pb-6 flex-shrink-0">
             {/* Indicador de arrastrabilidad */}
             <div className="w-12 h-1.5 bg-gray-300 rounded-full mx-auto mb-6"></div>
-            
+
             <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4"
-                 style={{ 
-                   background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-                   boxShadow: '0 8px 20px rgba(16, 185, 129, 0.3)'
-                 }}>
+              style={{
+                background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                boxShadow: '0 8px 20px rgba(16, 185, 129, 0.3)'
+              }}>
               <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
               </svg>
@@ -65,7 +80,9 @@ const ModalSuccessMobile = ({ isOpen, orderData, customerName, onClose }) => {
             <h2 className="text-2xl font-light text-gray-900 mb-2">Pedido confirmado</h2>
             <p className="text-gray-600 text-base leading-relaxed">
               {customerName ? `Gracias ${customerName}` : 'Gracias'}<br />
-              <span className="text-sm text-gray-500">Tu orden está lista para recoger</span>
+              <span className="text-sm text-gray-500">
+                Tu pedido ha sido recibido. {preparationMessage || ''}
+              </span>
             </p>
           </div>
 
@@ -80,9 +97,11 @@ const ModalSuccessMobile = ({ isOpen, orderData, customerName, onClose }) => {
                 </div>
               </div>
               <div className="text-xs text-gray-500 px-4 leading-relaxed">
-                Presenta este código para recoger tu pedido en KiKOI
+                Presenta este código para recoger tu pedido
               </div>
             </div>
+
+
 
             {/* Resumen rápido - Información esencial primero */}
             <div className="bg-gray-50 rounded-2xl p-5 mb-6">
@@ -109,8 +128,8 @@ const ModalSuccessMobile = ({ isOpen, orderData, customerName, onClose }) => {
                   {orderData.cartItems.map((item, index) => (
                     <div key={index} className="flex items-center justify-between bg-white rounded-xl p-4 shadow-sm">
                       <div className="flex items-center space-x-3">
-                        <img 
-                          src={item.img} 
+                        <img
+                          src={item.img}
                           alt={item.name}
                           className="w-10 h-10 object-cover rounded-lg bg-gray-200 flex-shrink-0"
                           onError={(e) => {
@@ -144,21 +163,21 @@ const ModalSuccessMobile = ({ isOpen, orderData, customerName, onClose }) => {
                   <span className="text-gray-600">Subtotal:</span>
                   <span className="font-medium">${orderData?.subtotal || orderData?.totalAmount || 0}</span>
                 </div>
-                
+
                 {orderData?.discount_percentage > 0 && (
                   <div className="flex justify-between text-sm text-green-600">
                     <span>Descuento ({orderData.discount_percentage}%):</span>
                     <span>-${((orderData?.totalAmount || 0) * (orderData.discount_percentage / 100)).toFixed(2)}</span>
                   </div>
                 )}
-                
+
                 {orderData?.dict_combos_apply && Object.keys(orderData.dict_combos_apply).length > 0 && (
                   <div className="flex justify-between text-sm text-green-600">
                     <span>Promociones aplicadas:</span>
                     <span>{Object.keys(orderData.dict_combos_apply).length} combos</span>
                   </div>
                 )}
-                
+
                 <div className="border-t border-gray-200 pt-2 mt-3">
                   <div className="flex justify-between text-base font-medium">
                     <span className="text-gray-900">Total:</span>
@@ -197,16 +216,7 @@ const ModalSuccessMobile = ({ isOpen, orderData, customerName, onClose }) => {
               </div>
             )}
 
-            {/* Información de siguiente paso */}
-            <div className="text-center mb-6">
-              <div className="bg-green-50 rounded-2xl p-5">
-                <div className="font-medium text-green-800 mb-2">¿Qué sigue?</div>
-                <div className="text-sm text-green-600 leading-relaxed">
-                  Tu pedido está siendo preparado en KiKOI.<br />
-                  Te avisaremos cuando esté listo para recoger.
-                </div>
-              </div>
-            </div>
+
           </div>
 
           {/* Footer fijo - Botón prominente */}
