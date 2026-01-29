@@ -1,15 +1,15 @@
 {
   "files": {
-    "main.css": "/KiKOI-webpage/static/css/main.c5fd6a38.css",
-    "main.js": "/KiKOI-webpage/static/js/main.56b2e67f.js",
+    "main.css": "/KiKOI-webpage/static/css/main.b9284fed.css",
+    "main.js": "/KiKOI-webpage/static/js/main.c2a71d07.js",
     "static/js/453.22eeb325.chunk.js": "/KiKOI-webpage/static/js/453.22eeb325.chunk.js",
     "index.html": "/KiKOI-webpage/index.html",
-    "main.c5fd6a38.css.map": "/KiKOI-webpage/static/css/main.c5fd6a38.css.map",
-    "main.56b2e67f.js.map": "/KiKOI-webpage/static/js/main.56b2e67f.js.map",
+    "main.b9284fed.css.map": "/KiKOI-webpage/static/css/main.b9284fed.css.map",
+    "main.c2a71d07.js.map": "/KiKOI-webpage/static/js/main.c2a71d07.js.map",
     "453.22eeb325.chunk.js.map": "/KiKOI-webpage/static/js/453.22eeb325.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.c5fd6a38.css",
-    "static/js/main.56b2e67f.js"
+    "static/css/main.b9284fed.css",
+    "static/js/main.c2a71d07.js"
   ]
 }
