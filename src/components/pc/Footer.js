@@ -1,71 +1,118 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useLocation } from 'wouter';
-
-const options = [
-	{ label: 'Inicio', value: 'inicio' },
-	{ label: 'Menu', value: 'menu' },
-	{ label: 'Galeria', value: 'galeria' },
-	{ label: 'Promociones', value: 'promociones' },
-];
-
+import { useCartStore } from '../../cartStore';
 
 const Footer = () => {
 	const [location, setLocation] = useLocation();
-	// Normaliza la ruta para mostrar la opción activa
-	let normalizedLocation = 'inicio';
-	if (location === '/') normalizedLocation = 'inicio';
-	else if (location === '/menu') normalizedLocation = 'menu';
-	else if (location === '/galeria') normalizedLocation = 'galeria';
-	else if (location === '/promociones') normalizedLocation = 'promociones';
-	// Puedes agregar más rutas si es necesario
+	const setCartOpen = useCartStore(state => state.setCartOpen);
+	const cartOpen = useCartStore(state => state.cartOpen);
+
+	if (cartOpen) return null;
+
+	// Normalize location
+	const isActive = (path) => location === path;
+
+	// Add custom SVG icon for Wallet instead of relying on missing public asset
+	const WalletIcon = ({ color }) => (
+		<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+			<path d="M4 4H14V14H4V4Z" stroke={color} strokeWidth="2" />
+			<path d="M7 17H17V7H17" stroke={color} strokeWidth="2" />
+			<path d="M14 14V20H4V14H14Z" stroke={color} strokeWidth="2" />
+			<path d="M20 14V10H14V14H20Z" stroke={color} strokeWidth="2" />
+			<path d="M17 17V20H20V17H17Z" stroke={color} strokeWidth="2" />
+		</svg>
+	);
+
+	const navItems = [
+		{
+			label: 'Inicio',
+			path: '/',
+			icon: 'icon_home.svg',
+			action: () => setLocation('/')
+		},
+		{
+			label: 'Menu',
+			path: '/menu',
+			icon: 'coffee_icon.svg', // using coffee icon for menu based on the image provided
+			action: () => setLocation('/menu')
+		},
+		{
+			label: 'Wallet',
+			path: '/wallet', // or null if coming soon
+			isWallet: true,
+			action: () => setLocation('/wallet') // Navigate instead of alert
+		}
+	];
 
 	return (
-		<footer className="footer-fixed w-full border-t bg-white" style={{ borderTop: '1px solid #f2f2f2' }}>
-			<div className="flex justify-center items-center py-3 md:py-4">
-				{/* Diseño para móvil: 2x2 grid */}
-				<div className="grid grid-cols-2 gap-2 w-full px-4 md:hidden">
-				{options.map(opt => {
-					let path = '/';
-					if (opt.value === 'menu') path = '/menu';
-					if (opt.value === 'galeria') path = '/galeria';
-					if (opt.value === 'promociones') path = '/promociones';
-					const isActive = normalizedLocation === opt.value;
-						return (
-							<button
-								key={opt.value}
-								onClick={() => setLocation(path)}
-								className={`text-sm font-light transition-colors duration-200 px-2 py-2 rounded-lg ${
-									isActive 
-										? 'text-black bg-gray-50' 
-										: 'text-gray-400 hover:text-gray-600 hover:bg-gray-50'
-								}`}
-							>
-								{opt.label}
-							</button>
-						);
-					})}
-				</div>
+		<footer 
+			className="w-full flex justify-center pb-safe pointer-events-none" 
+			style={{ 
+				position: 'fixed', 
+				bottom: 0, 
+				left: 0, 
+				zIndex: 1000, 
+				background: '#FFFFFF',
+				paddingTop: '12px',
+				paddingBottom: '12px'
+			}}
+		>
+			{/* Pill Container */}
+			<div 
+				className="pointer-events-auto flex justify-between items-center px-4"
+				style={{
+					width: '347px',
+					height: '60px',
+					background: '#F5F5F5',
+					borderRadius: '100px',
+					boxShadow: '0 4px 12px rgba(0,0,0,0.05)' // Optional subtle shadow for visibility over content
+				}}
+			>
+				{navItems.map((item) => {
+					const active = item.path && isActive(item.path);
+					const color = active ? '#CE5C28' : '#B2B2B2';
 
-				{/* Diseño para desktop: horizontal */}
-				<div className="hidden md:flex space-x-8 mx-8">
-				{options.map(opt => {
-					let path = '/';
-					if (opt.value === 'menu') path = '/menu';
-					if (opt.value === 'galeria') path = '/galeria';
-					if (opt.value === 'promociones') path = '/promociones';
-					const isActive = normalizedLocation === opt.value;
 					return (
 						<button
-							key={opt.value}
-							onClick={() => setLocation(path)}
-							className={`text-base font-light transition-colors duration-200 px-2 py-1 ${isActive ? 'text-black' : 'text-gray-400'}`}
-								style={{ marginLeft: 32, marginRight: 32, background: 'transparent' }}
+							key={item.label}
+							onClick={item.action}
+							className="flex flex-col items-center justify-center p-2 focus:outline-none flex-1 transition-transform active:scale-95"
+						>
+							<div className="flex items-center justify-center w-6 h-6 mb-[2px]">
+								{item.isWallet ? (
+									<WalletIcon color={color} />
+								) : (
+									<img
+										src={`${process.env.PUBLIC_URL}/assets/${item.icon}`}
+										alt={item.label}
+										className="w-full h-full object-contain"
+										style={{
+											filter: active
+												? 'brightness(0) saturate(100%) invert(43%) sepia(87%) saturate(1458%) hue-rotate(346deg) brightness(97%) contrast(92%)' // #CE5C28
+												: 'brightness(0) saturate(100%) invert(80%) sepia(0%) saturate(83%) hue-rotate(152deg) brightness(96%) contrast(85%)'  // #B2B2B2
+										}}
+									/>
+								)}
+							</div>
+							<span
+								style={{
+									fontFamily: 'Inter',
+									fontStyle: 'normal',
+									fontWeight: 400,
+									fontSize: '14px',
+									lineHeight: '17px',
+									display: 'flex',
+									alignItems: 'center',
+									textAlign: 'center',
+									color: color,
+									transition: 'color 0.2s ease'
+								}}
 							>
-								{opt.label}
-							</button>
-						);
-					})}
-				</div>
+								{item.label}
+							</span>
+						</button>
+					);
+				})}
 			</div>
 		</footer>
 	);

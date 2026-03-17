@@ -5,11 +5,34 @@ import Inicio from './pages/Inicio';
 import Menu from './pages/Menu';
 import Galeria from './pages/Galeria';
 import Promociones from './pages/Eventos';
-import Announcement from './components/pc/Announcement';
+import Wallet from './pages/Wallet';
+import Welcome from './components/pc/Welcome';
+import { useCartStore } from './cartStore';
 
 function App() {
-  // Estado para el status de la tienda
-  const [storeOpen, setStoreOpen] = useState(true);
+  // Estado para controlar si se muestra la pantalla de bienvenida
+  const [showWelcome, setShowWelcome] = useState(true);
+  const [hasActiveSession, setHasActiveSession] = useState(false);
+
+  // Usar el store para el estado de la tienda
+  const setStoreOpen = useCartStore(state => state.setStoreOpen);
+  const initializeFromSession = useCartStore(state => state.initializeFromSession);
+
+  // Verificar sesión al cargar la app y periódicamente
+  useEffect(() => {
+    const checkSession = () => {
+      const sessionExists = initializeFromSession();
+      setHasActiveSession(sessionExists);
+    };
+
+    // Check inicial
+    checkSession();
+
+    // Check cada segundo para detectar cambios de sesión
+    const sessionCheckInterval = setInterval(checkSession, 1000);
+
+    return () => clearInterval(sessionCheckInterval);
+  }, [initializeFromSession]);
 
   // Función para obtener el status de la tienda
   const fetchStoreStatus = () => {
@@ -37,19 +60,38 @@ function App() {
     return () => clearInterval(intervalId);
   }, []);
 
+  // Ocultar pantalla de bienvenida después de 2 segundos
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowWelcome(false);
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Si se debe mostrar la pantalla de bienvenida
+  if (showWelcome) {
+    return <Welcome />;
+  }
+
   return (
     <>
-      {/* Mostrar anuncio si la tienda está cerrada */}
-      {!storeOpen && <Announcement />}
-
       <Router base="/KiKOI-webpage">
         <Switch>
           <Route path="/" component={Inicio} />
-          <Route path="/menu" component={Menu} />
-          <Route path="/galeria" component={Galeria} />
-          <Route path="/promociones" component={Promociones} />
+          <Route path="/menu">
+            {hasActiveSession ? <Menu /> : <Inicio />}
+          </Route>
+          <Route path="/galeria">
+            {hasActiveSession ? <Galeria /> : <Inicio />}
+          </Route>
+          <Route path="/promociones">
+            {hasActiveSession ? <Promociones /> : <Inicio />}
+          </Route>
+          <Route path="/wallet">
+            {hasActiveSession ? <Wallet /> : <Inicio />}
+          </Route>
         </Switch>
-        {/* Las clases Tailwind para navbar-fixed y footer-fixed ya están aplicadas en los componentes Navbar y Footer */}
       </Router>
     </>
   );

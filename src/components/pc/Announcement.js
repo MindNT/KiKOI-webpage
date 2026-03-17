@@ -15,11 +15,11 @@ const Announcement = () => {
     }, []);
 
     return (
-        <div className="fixed inset-0 z-[10000] bg-black flex items-center justify-center overflow-hidden font-inter p-6">
+        <div className="fixed inset-0 z-[10000] bg-black flex items-center justify-center overflow-hidden p-6">
             <div
                 className={`text-center max-w-2xl transition-all duration-700 ease-in-out ${isVisible
-                        ? 'opacity-100 scale-100'
-                        : 'opacity-0 scale-95'
+                    ? 'opacity-100 scale-100'
+                    : 'opacity-0 scale-95'
                     }`}
             >
                 {/* Icono de tienda cerrada */}
@@ -47,13 +47,13 @@ const Announcement = () => {
                         letterSpacing: '0.08em'
                     }}
                 >
-                    TEMPORALMENTE CERRADO
+                    ESTAMOS EN UN BREAK
                 </h1>
 
                 {/* Mensaje principal */}
                 <p className="text-gray-400 text-lg md:text-xl font-light leading-relaxed mb-10">
-                    En este momento no estamos recibiendo pedidos.<br />
-                    Vuelve pronto cuando el negocio esté abierto.
+                    Estamos tomando un descanso para recargar energías.<br />
+                    Regresa pronto para hacer tu pedido.
                 </p>
 
                 {/* Línea decorativa */}
@@ -62,7 +62,7 @@ const Announcement = () => {
                 {/* Información adicional */}
                 <p className="text-gray-500 text-base font-light leading-relaxed">
                     Podrás realizar pedidos nuevamente<br />
-                    cuando <span className="text-white/80">reabramos nuestras puertas</span>
+                    cuando <span className="text-white/80">regresemos de nuestro break</span>
                 </p>
 
                 {/* Logo o footer */}

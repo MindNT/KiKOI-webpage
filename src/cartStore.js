@@ -9,9 +9,14 @@ export const useCartStore = create((set, get) => ({
   showSuccess: false,
   orderData: null,
   customerName: '',
+  phoneNumber: '',
+  // Estado para el status de la tienda
+  storeOpen: true,
+  setStoreOpen: (open) => set({ storeOpen: open }),
   setShowSuccess: (show) => set({ showSuccess: show }),
   setOrderData: (data) => set({ orderData: data }),
   setCustomerName: (name) => set({ customerName: name }),
+  setPhoneNumber: (phone) => set({ phoneNumber: phone }),
   addToCart: (item) => {
     const cart = get().cart;
     const existing = cart.find(p => p.id === item.id);
@@ -38,5 +43,20 @@ export const useCartStore = create((set, get) => ({
   },
   clearCart: () => {
     set({ cart: [], cartTotal: 0 });
+  },
+  // Session management helpers
+  initializeFromSession: () => {
+    const phone = sessionStorage.getItem('kikoi_phone');
+    const name = sessionStorage.getItem('kikoi_customer_name');
+    if (phone && name) {
+      set({ phoneNumber: phone, customerName: name });
+      return true;
+    }
+    return false;
+  },
+  clearSession: () => {
+    sessionStorage.removeItem('kikoi_phone');
+    sessionStorage.removeItem('kikoi_customer_name');
+    set({ phoneNumber: '', customerName: '' });
   },
 }));

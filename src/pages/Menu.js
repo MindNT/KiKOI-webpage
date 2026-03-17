@@ -1,13 +1,15 @@
-import React, { useEffect, useState } from 'react';
-import Navbar from '../components/pc/Navbar';
+import React, { useEffect, useState, useMemo, useRef } from 'react';
 import Footer from '../components/pc/Footer';
 import Billingcar from '../components/pc/Billingcar';
-import ProductCard from '../components/pc/ProductCard';
-import ModalSuccess from '../components/pc/ModalSuccess';
+import ProductCardMenu from '../components/pc/ProductCardMenu';
 import ModalSuccessMobile from '../components/pc/ModalSuccessMobile';
+import BrownButton from '../utils/OrangeButton';
+import BrownRounded from '../utils/OrangeCircle';
+import OrangeRounded from '../utils/OrangeRounded';
+import SearchBar from '../utils/searchbar';
+import CarouselTag from '../components/pc/CarouselTag';
 import { useCartStore } from '../cartStore';
 import { Toaster, toast } from 'sonner';
-
 
 // Función para formatear URLs de Google Drive
 const formatGoogleDriveUrl = (url) => {
@@ -25,102 +27,99 @@ const formatGoogleDriveUrl = (url) => {
 	return `https://drive.google.com/thumbnail?id=${fileId}&sz=w1000`;
 };
 
-
-
 const addToCart = (item) => {
 	useCartStore.getState().addToCart(item);
-	toast.success(`✓ ${item.name} agregado al carrito · $${item.price}`, {
+	toast.success(`✓ ${item.name} agregado al carrito`, {
 		position: 'top-center',
-		duration: 3000,
-		className: 'bg-gray-50 text-gray-800 border border-gray-200 font-inter text-sm font-normal shadow-sm',
+		duration: 2000,
+		className: 'bg-gray-900 text-white text-sm font-medium shadow-lg border-none',
 	});
 };
 
-
-
-
 const Menu = () => {
-	// Estado para categorías y productos (debe estar dentro del componente)
 	const [categories, setCategories] = useState([]);
 	const [menuItems, setMenuItems] = useState([]);
+	const [selectedCategoryId, setSelectedCategoryId] = useState(null);
+	const [isSearchOpen, setIsSearchOpen] = useState(false);
 	const [searchTerm, setSearchTerm] = useState('');
-
-	// Hook para detectar dispositivos móviles
 	const [isMobile, setIsMobile] = useState(false);
 
+	/* Logic for Swipe-based Category Selection */
+	const productListRef = useRef(null);
+	const touchStartX = useRef(0);
+	const touchEndX = useRef(0);
+
+
+
+	// Swipe handlers for product list
+	const handleTouchStart = (e) => {
+		touchStartX.current = e.touches[0].clientX;
+	};
+
+	const handleTouchMove = (e) => {
+		touchEndX.current = e.touches[0].clientX;
+	};
+
+	const handleTouchEnd = () => {
+		if (!touchStartX.current || !touchEndX.current) return;
+
+		const swipeDistance = touchStartX.current - touchEndX.current;
+		const minSwipeDistance = 50; // Minimum distance for a swipe
+
+		if (Math.abs(swipeDistance) > minSwipeDistance) {
+			const currentIndex = categories.findIndex(c => c.id === selectedCategoryId);
+
+			if (swipeDistance > 0) {
+				// Swiped left - go to previous category
+				const prevIndex = currentIndex === 0 ? categories.length - 1 : currentIndex - 1;
+				setSelectedCategoryId(categories[prevIndex].id);
+			} else {
+				// Swiped right - go to next category
+				const nextIndex = (currentIndex + 1) % categories.length;
+				setSelectedCategoryId(categories[nextIndex].id);
+			}
+		}
+
+		// Reset
+		touchStartX.current = 0;
+		touchEndX.current = 0;
+	};
+
+	// Detectar móvil
 	useEffect(() => {
 		const checkIsMobile = () => {
-			const userAgent = navigator.userAgent || navigator.vendor || window.opera;
-			const mobileRegex = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i;
-			const isMobileUA = mobileRegex.test(userAgent.toLowerCase());
-			const isSmallScreen = window.innerWidth <= 768;
-			setIsMobile(isMobileUA || isSmallScreen);
+			const isSmall = window.innerWidth <= 768;
+			setIsMobile(isSmall);
 		};
-
 		checkIsMobile();
 		window.addEventListener('resize', checkIsMobile);
 		return () => window.removeEventListener('resize', checkIsMobile);
 	}, []);
 
-	// Estados del modal de éxito
+	// Store data
 	const showSuccess = useCartStore(state => state.showSuccess);
 	const orderData = useCartStore(state => state.orderData);
 	const customerName = useCartStore(state => state.customerName);
 	const setShowSuccess = useCartStore(state => state.setShowSuccess);
 	const setOrderData = useCartStore(state => state.setOrderData);
 	const setCustomerNameGlobal = useCartStore(state => state.setCustomerName);
+	const setCartOpen = useCartStore(state => state.setCartOpen);
 
-	// Función para cerrar el modal de éxito
 	const handleCloseSuccess = () => {
 		setShowSuccess(false);
 		setOrderData(null);
 		setCustomerNameGlobal('');
 	};
 
-	// Función para scroll suave a una categoría
-	const scrollToCategory = (categoryId) => {
-		const element = document.getElementById(`category-${categoryId}`);
-		if (element) {
-			const navbarHeight = 80; // Altura del navbar fijo
-			const offset = navbarHeight + 20; // Espacio adicional
-			const elementPosition = element.getBoundingClientRect().top;
-			const offsetPosition = elementPosition + window.pageYOffset - offset;
-
-			window.scrollTo({
-				top: offsetPosition,
-				behavior: 'smooth'
-			});
-		}
-	};
-
-	// Función para filtrar productos por búsqueda
-	const filterItemsBySearch = (items) => {
-		if (!searchTerm.trim()) return items;
-		return items.filter(item =>
-			item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-			(item.description && item.description.toLowerCase().includes(searchTerm.toLowerCase())) ||
-			(item.atributo_1 && item.atributo_1.toLowerCase().includes(searchTerm.toLowerCase())) ||
-			(item.atributo_2 && item.atributo_2.toLowerCase().includes(searchTerm.toLowerCase()))
-		);
-	};
-
-	// Función para obtener la fecha formateada
-	const getFormattedDate = () => {
-		const today = new Date();
-		const year = today.getFullYear();
-		const month = String(today.getMonth() + 1).padStart(2, '0');
-		const day = String(today.getDate()).padStart(2, '0');
-		return `${year}-${month}-${day}`;
-	};
-
-	// Función para obtener productos
+	// Fetch Data
 	const fetchMenuItems = () => {
-		const formattedDate = getFormattedDate();
+		const today = new Date();
+		const formattedDate = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+
 		fetch(`https://kikoi-management.mindnt.com.mx/items/get-items-day?day=${formattedDate}`)
 			.then(res => res.json())
 			.then(data => {
 				if (data.status === 'success' && Array.isArray(data.data)) {
-					// Normalizar los nombres de las propiedades del backend
 					const normalizedItems = data.data.map(item => ({
 						...item,
 						name: item.Nombre || item.name,
@@ -130,144 +129,134 @@ const Menu = () => {
 					setMenuItems(normalizedItems);
 				}
 			})
-			.catch(err => console.error('Error al obtener items:', err));
+			.catch(err => console.error('Error fetching items:', err));
 	};
 
-	// Función para obtener categorías
 	const fetchCategories = () => {
 		fetch('https://kikoi-management.mindnt.com.mx/items/categories')
 			.then(res => res.json())
 			.then(data => {
 				if (data.status === 'success' && Array.isArray(data.data)) {
-					setCategories(data.data.filter(cat => cat.is_active));
+					const activeCats = data.data.filter(cat => cat.is_active);
+					setCategories(activeCats);
+					if (activeCats.length > 0 && !selectedCategoryId) {
+						setSelectedCategoryId(activeCats[0].id);
+					}
 				}
 			})
-			.catch(err => console.error('Error al obtener categorías:', err));
+			.catch(err => console.error('Error fetching categories:', err));
 	};
 
-	// Fetch inicial y polling cada 3 segundos
 	useEffect(() => {
-		// Carga inicial
 		fetchCategories();
 		fetchMenuItems();
-
-		// Polling cada 3 segundos para productos (actualización silenciosa)
-		const intervalId = setInterval(() => {
-			fetchMenuItems();
-		}, 3000);
-
-		// Limpiar el intervalo al desmontar
+		const intervalId = setInterval(fetchMenuItems, 5000);
 		return () => clearInterval(intervalId);
 	}, []);
 
+	// Filtering
+	const filteredItems = useMemo(() => {
+		let items = menuItems;
+
+		// Filter by category if not searching globally (or even if searching, usually scoped to cat or global? 
+		// Reference implies category view. I'll filter by category first unless searching.)
+		// But mobile apps usually search *all*. I'll keep it simple: Search overrides category, else show category.
+		if (searchTerm.trim()) {
+			return items.filter(item =>
+				item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+				(item.description && item.description.toLowerCase().includes(searchTerm.toLowerCase()))
+			);
+		}
+
+		if (selectedCategoryId) {
+			return items.filter(item => item.category_id === selectedCategoryId);
+		}
+
+		return [];
+	}, [menuItems, selectedCategoryId, searchTerm]);
+
+	const selectedCategoryName = categories.find(c => c.id === selectedCategoryId)?.name || 'Menú';
+
 	return (
 		<>
-			<Toaster
-				richColors={false}
-				position="top-center"
-				toastOptions={{
-					className: 'bg-gray-50 text-gray-800 border border-gray-200 font-inter text-sm font-normal shadow-sm',
-				}}
-			/>
-			<div className="min-h-screen bg-white font-inter relative">
-				{/* Navbar flotante */}
-				<div className="fixed top-0 left-0 w-full z-50 bg-white">
-					<Navbar />
-				</div>
-				{/* Contenido scrolleable */}
-				<div className="pt-20 pb-20 px-8 min-h-[calc(100vh-128px)] overflow-y-auto">
-					<h2 className="text-4xl font-extralight mb-8 text-center">Menú</h2>
+			<Toaster richColors={false} position="top-center" />
+			{/* Max-width container for mobile - responsive */}
+			<div className="w-full sm:max-w-[480px] mx-auto">
+				<div className="min-h-screen bg-white relative pb-[100px]">
 
-					{/* Barra de búsqueda */}
-					<div className="max-w-md mx-auto mb-8">
-						<div className="relative">
-							<div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-								<svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-									<path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-								</svg>
+					{/* Custom Header */}
+					<header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md px-0 pt-6 pb-3 transition-all duration-300">
+						<div className="flex items-center justify-between mb-4 px-6">
+							<div className="flex flex-col">
+								<h1
+									style={{
+										fontFamily: 'Inter',
+										fontStyle: 'normal',
+										fontWeight: 400,
+										fontSize: '20px',
+										lineHeight: '24px',
+										color: '#CE5C28'
+									}}
+									className="text-left"
+								>
+									BIENVENIDO!
+								</h1>
+								<p
+									style={{
+										fontFamily: 'Inter',
+										fontStyle: 'normal',
+										fontWeight: 800,
+										fontSize: '16px',
+										lineHeight: '19px',
+										color: '#2C2C2C'
+									}}
+									className="text-left"
+								>
+									{customerName || 'Invitado'}
+								</p>
 							</div>
-							<input
-								type="text"
-								placeholder="Buscar productos..."
+							<div className="flex items-center gap-3">
+								<BrownRounded
+									text="Carrito"
+									icon={`${process.env.PUBLIC_URL}/assets/icon_cart.svg`}
+									onClick={() => setCartOpen(true)}
+								/>
+							</div>
+						</div>
+
+						{/* Search Bar */}
+						<div className="px-6 mb-2">
+							<SearchBar
 								value={searchTerm}
 								onChange={(e) => setSearchTerm(e.target.value)}
-								className="w-full pl-12 pr-4 py-3 rounded-2xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent text-sm font-light transition-all duration-200"
-								style={{
-									background: 'rgba(249, 250, 251, 0.8)',
-									backdropFilter: 'blur(10px)'
-								}}
 							/>
-							{searchTerm && (
-								<button
-									onClick={() => setSearchTerm('')}
-									className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-gray-600 transition-colors"
-								>
-									<svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-										<path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-									</svg>
-								</button>
-							)}
 						</div>
-					</div>
 
-					{/* Navegación por categorías - Principios de Ive: simplicidad y funcionalidad */}
-					{!searchTerm && categories.length > 0 && (
-						<div className="mb-8">
-							<div className="flex flex-wrap justify-center gap-2 md:gap-3 max-w-4xl mx-auto">
-								{categories.map(category => {
-									const items = menuItems.filter(item => item.category_id === category.id);
-									if (items.length === 0) return null;
+						{/* Category Carousel */}
+						{!searchTerm && (
+							<CarouselTag
+								onCategoryChange={setSelectedCategoryId}
+								selectedCategoryId={selectedCategoryId}
+							/>
+						)}
+						{searchTerm && (
+							<h2 className="text-2xl font-light text-gray-900 px-6">Resultados</h2>
+						)}
+					</header >
 
-									return (
-										<button
-											key={category.id}
-											onClick={() => scrollToCategory(category.id)}
-											className="px-4 md:px-6 py-2 md:py-3 rounded-full border border-gray-200 text-sm md:text-base font-light transition-all duration-200 hover:border-gray-400 hover:bg-gray-50 hover:shadow-sm active:scale-95"
-											style={{
-												background: 'rgba(255, 255, 255, 0.9)',
-												backdropFilter: 'blur(10px)',
-												WebkitBackdropFilter: 'blur(10px)'
-											}}
-										>
-											{category.name}
-										</button>
-									);
-								})}
-							</div>
-						</div>
-					)}
-
-					{/* Leyenda de instrucciones */}
-					<div className="flex items-center justify-center gap-2 mb-16 text-gray-500">
-						<img
-							src={process.env.PUBLIC_URL + '/assets/click.svg'}
-							alt="Click"
-							className="w-4 h-4 opacity-60"
-						/>
-						<p className="text-sm font-light">
-							Toca la imagen del producto para ver más detalles
-						</p>
-					</div>
-					{categories.map(category => {
-						const items = menuItems.filter(item => item.category_id === category.id);
-						const filteredItems = filterItemsBySearch(items);
-
-						// Solo mostrar la categoría si tiene productos que coincidan con la búsqueda
-						if (filteredItems.length === 0) return null;
-
-						return (
-							<div key={category.id} className="mb-20" id={`category-${category.id}`}>
-								<h3 className="text-2xl font-extralight mb-8 text-gray-600">
-									{category.name}
-									{searchTerm && (
-										<span className="text-sm text-gray-400 font-normal ml-2">
-											({filteredItems.length} resultado{filteredItems.length !== 1 ? 's' : ''})
-										</span>
-									)}
-								</h3>
-								<div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-3 md:gap-4">
+					{/* Product List */}
+					< main
+						ref={productListRef}
+						className="px-3 py-4"
+						onTouchStart={handleTouchStart}
+						onTouchMove={handleTouchMove}
+						onTouchEnd={handleTouchEnd}
+					>
+						{
+							filteredItems.length > 0 ? (
+								<div className="grid grid-cols-2 gap-2 justify-items-center">
 									{filteredItems.map(item => (
-										<ProductCard
+										<ProductCardMenu
 											key={item.id}
 											id={item.id}
 											name={item.name}
@@ -280,58 +269,33 @@ const Menu = () => {
 										/>
 									))}
 								</div>
-							</div>
-						);
-					})}
-
-					{/* Mensaje cuando no hay resultados */}
-					{searchTerm && categories.every(category => {
-						const items = menuItems.filter(item => item.category_id === category.id);
-						const filteredItems = filterItemsBySearch(items);
-						return filteredItems.length === 0;
-					}) && (
-							<div className="text-center py-16">
-								<div className="mb-4">
-									<svg className="w-16 h-16 text-gray-300 mx-auto" fill="none" stroke="currentColor" strokeWidth="1" viewBox="0 0 24 24">
-										<path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-									</svg>
-								</div>
-								<h3 className="text-xl font-light text-gray-400 mb-2">No se encontraron productos</h3>
-								<p className="text-gray-400 text-sm">
-									Intenta con otro término de búsqueda o
+							) : (
+								<div className="flex flex-col items-center justify-center py-20 px-6 text-center">
+									<p className="text-gray-400 font-light mb-2">No se encontraron productos en esta categoría o búsqueda.</p>
 									<button
-										onClick={() => setSearchTerm('')}
-										className="text-gray-600 hover:text-gray-800 underline ml-1"
+										onClick={() => { setSearchTerm(''); setSelectedCategoryId(categories[0]?.id); }}
+										className="text-brand-orange text-sm font-medium hover:underline"
 									>
-										ver todos los productos
+										Limpiar filtros
 									</button>
-								</p>
-							</div>
-						)}
-				</div>
-				{/* Footer flotante */}
-				<div className="fixed bottom-0 left-0 w-full z-50 bg-white">
-					<Footer />
-				</div>
-				{/* Billingcar sidebar */}
-				<Billingcar />
+								</div>
+							)
+						}
+					</main >
 
-				{/* Modal de éxito - Condicional según dispositivo */}
-				{isMobile ? (
+					{/* Footer Fixed */}
+					<Footer />
+
+					{/* Sidebars/Modals */}
+					< Billingcar />
 					<ModalSuccessMobile
 						isOpen={showSuccess}
 						orderData={orderData}
 						customerName={customerName}
 						onClose={handleCloseSuccess}
 					/>
-				) : (
-					<ModalSuccess
-						isOpen={showSuccess}
-						orderData={orderData}
-						customerName={customerName}
-						onClose={handleCloseSuccess}
-					/>
-				)}
+
+				</div >
 			</div>
 		</>
 	);

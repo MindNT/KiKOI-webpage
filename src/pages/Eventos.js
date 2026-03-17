@@ -6,7 +6,7 @@ import Billingcar from '../components/pc/Billingcar';
 
 const Promociones = () => {
   return (
-    <div className="min-h-screen bg-white font-inter relative">
+    <div className="min-h-screen bg-white relative">
       {/* Navbar flotante */}
       <div className="fixed top-0 left-0 w-full z-50 bg-white">
         <Navbar />
