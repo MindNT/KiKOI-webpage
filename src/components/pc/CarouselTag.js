@@ -1,5 +1,8 @@
 import React, { useEffect, useState, useRef } from 'react';
 
+// Pseudo-category ID for the virtual "Promociones" tab
+export const PROMOS_CATEGORY_ID = '__promotions__';
+
 const CarouselTag = ({ onCategoryChange, selectedCategoryId }) => {
     const [categories, setCategories] = useState([]);
     const [activeCategory, setActiveCategory] = useState(null);
@@ -16,12 +19,11 @@ const CarouselTag = ({ onCategoryChange, selectedCategoryId }) => {
                     const activeCats = data.data.filter(cat => cat.is_active);
                     setCategories(activeCats);
 
-                    // Set first category as active if none selected
-                    if (activeCats.length > 0 && !selectedCategoryId) {
-                        const firstCat = activeCats[0];
-                        setActiveCategory(firstCat.id);
-                        onCategoryChange(firstCat.id);
-                    } else if (selectedCategoryId) {
+                    // Always default to Promociones on first load
+                    if (!selectedCategoryId) {
+                        setActiveCategory(PROMOS_CATEGORY_ID);
+                        onCategoryChange(PROMOS_CATEGORY_ID);
+                    } else {
                         setActiveCategory(selectedCategoryId);
                     }
                 }
@@ -46,7 +48,11 @@ const CarouselTag = ({ onCategoryChange, selectedCategoryId }) => {
         onCategoryChange(categoryId);
     };
 
-
+    // Build the full list: Promociones tab first, then real categories
+    const allTabs = [
+        { id: PROMOS_CATEGORY_ID, name: 'Promociones', isPromo: true },
+        ...categories.map(c => ({ ...c, isPromo: false })),
+    ];
 
     return (
         <div className="relative w-full px-6 py-4">
@@ -61,36 +67,89 @@ const CarouselTag = ({ onCategoryChange, selectedCategoryId }) => {
                     touchAction: 'pan-x'
                 }}
             >
-                {categories.map((category) => {
-                    const isActive = activeCategory === category.id;
+                {allTabs.map((tab) => {
+                    const isActive = activeCategory === tab.id;
+
+                    // ── Promociones tab styles ──────────────────────────────
+                    let bg, border, color, fontWeight, shadow;
+
+                    if (tab.isPromo) {
+                        if (isActive) {
+                            bg = '#D97706';
+                            border = 'none';
+                            color = '#FFFFFF';
+                            fontWeight = 700;
+                            shadow = '0 3px 10px rgba(217, 119, 6, 0.4)';
+                        } else {
+                            bg = 'rgba(217, 119, 6, 0.10)';
+                            border = '1.5px solid rgba(217, 119, 6, 0.35)';
+                            color = '#A85C00';
+                            fontWeight = 600;
+                            shadow = 'none';
+                        }
+                    } else {
+                        // ── Regular category styles ─────────────────────────
+                        if (isActive) {
+                            bg = '#E36414';
+                            border = 'none';
+                            color = '#FFFFFF';
+                            fontWeight = 500;
+                            shadow = 'none';
+                        } else {
+                            bg = '#F5F5F5';
+                            border = '1px solid #F5F5F5';
+                            color = '#535353';
+                            fontWeight = 400;
+                            shadow = 'none';
+                        }
+                    }
 
                     return (
                         <button
-                            key={category.id}
-                            onClick={() => handleCategoryClick(category.id)}
-                            className="flex-shrink-0 transition-transform duration-200 ease-in-out transform active:scale-95 flex items-center justify-center cursor-pointer"
+                            key={tab.id}
+                            onClick={() => handleCategoryClick(tab.id)}
+                            className="flex-shrink-0 transition-all duration-200 ease-in-out transform active:scale-95 flex items-center justify-center cursor-pointer"
                             style={{
-                                width: '105px',
                                 height: '40px',
                                 boxSizing: 'border-box',
-                                background: isActive ? '#CE5C28' : '#F5F5F5',
-                                border: isActive ? 'none' : '1px solid #F5F5F5',
+                                background: bg,
+                                border,
                                 borderRadius: '25px',
-                                outline: 'none'
+                                outline: 'none',
+                                boxShadow: shadow,
+                                padding: tab.isPromo ? '0 14px 0 11px' : '0 16px',
+                                gap: tab.isPromo ? '5px' : '0',
                             }}
                         >
-                            <span 
-                                className="whitespace-nowrap overflow-hidden text-ellipsis px-2"
+                            {/* Lightning icon — only for Promo tab */}
+                            {tab.isPromo && (
+                                <svg
+                                    width="10"
+                                    height="13"
+                                    viewBox="0 0 11 14"
+                                    fill="none"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    style={{ flexShrink: 0 }}
+                                >
+                                    <path
+                                        d="M6.5 0.5L0.5 7.833H5L4.5 13.5L10.5 6.167H6L6.5 0.5Z"
+                                        fill={color}
+                                        strokeLinejoin="round"
+                                    />
+                                </svg>
+                            )}
+                            <span
+                                className="whitespace-nowrap"
                                 style={{
                                     fontFamily: 'Inter',
                                     fontStyle: 'normal',
-                                    fontWeight: isActive ? 500 : 400,
-                                    fontSize: '16px',
-                                    lineHeight: '19px',
-                                    color: isActive ? '#FFFFFF' : '#535353',
+                                    fontWeight,
+                                    fontSize: '14px',
+                                    lineHeight: '17px',
+                                    color,
                                 }}
                             >
-                                {category.name}
+                                {tab.name}
                             </span>
                         </button>
                     );

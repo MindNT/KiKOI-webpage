@@ -45,32 +45,32 @@ const Footer = () => {
 	];
 
 	return (
-		<footer 
-			className="w-full flex justify-center pb-safe pointer-events-none" 
-			style={{ 
-				position: 'fixed', 
-				bottom: 0, 
-				left: 0, 
-				zIndex: 1000, 
+		<footer
+			className="w-full flex justify-center pb-safe pointer-events-none"
+			style={{
+				position: 'fixed',
+				bottom: 0,
+				left: 0,
+				zIndex: 1000,
 				background: '#FFFFFF',
 				paddingTop: '12px',
 				paddingBottom: '12px'
 			}}
 		>
 			{/* Pill Container */}
-			<div 
+			<div
 				className="pointer-events-auto flex justify-between items-center px-4"
 				style={{
-					width: '347px',
+					width: 'min(90vw, 480px)',
 					height: '60px',
 					background: '#F5F5F5',
 					borderRadius: '100px',
-					boxShadow: '0 4px 12px rgba(0,0,0,0.05)' // Optional subtle shadow for visibility over content
+					boxShadow: '0 4px 12px rgba(0,0,0,0.05)'
 				}}
 			>
 				{navItems.map((item) => {
 					const active = item.path && isActive(item.path);
-					const color = active ? '#CE5C28' : '#B2B2B2';
+					const color = active ? '#E36414' : '#B2B2B2';
 
 					return (
 						<button

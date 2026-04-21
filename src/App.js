@@ -6,6 +6,7 @@ import Menu from './pages/Menu';
 import Galeria from './pages/Galeria';
 import Promociones from './pages/Eventos';
 import Wallet from './pages/Wallet';
+import OrderReady from './pages/OrderReady';
 import Welcome from './components/pc/Welcome';
 import { useCartStore } from './cartStore';
 
@@ -91,6 +92,7 @@ function App() {
           <Route path="/wallet">
             {hasActiveSession ? <Wallet /> : <Inicio />}
           </Route>
+          <Route path="/order-ready" component={OrderReady} />
         </Switch>
       </Router>
     </>

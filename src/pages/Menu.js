@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo, useRef } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import Footer from '../components/pc/Footer';
 import Billingcar from '../components/pc/Billingcar';
 import ProductCardMenu from '../components/pc/ProductCardMenu';
@@ -7,7 +7,8 @@ import BrownButton from '../utils/OrangeButton';
 import BrownRounded from '../utils/OrangeCircle';
 import OrangeRounded from '../utils/OrangeRounded';
 import SearchBar from '../utils/searchbar';
-import CarouselTag from '../components/pc/CarouselTag';
+import CarouselTag, { PROMOS_CATEGORY_ID } from '../components/pc/CarouselTag';
+import InstallPWA from '../utils/InstallPWA';
 import { useCartStore } from '../cartStore';
 import { Toaster, toast } from 'sonner';
 
@@ -29,61 +30,38 @@ const formatGoogleDriveUrl = (url) => {
 
 const addToCart = (item) => {
 	useCartStore.getState().addToCart(item);
-	toast.success(`✓ ${item.name} agregado al carrito`, {
-		position: 'top-center',
-		duration: 2000,
-		className: 'bg-gray-900 text-white text-sm font-medium shadow-lg border-none',
-	});
+	toast(
+		<div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+			<span style={{ fontWeight: 700, fontSize: '14px', lineHeight: '18px' }}>Agregado</span>
+			<span style={{ fontWeight: 400, fontSize: '13px', lineHeight: '17px', opacity: 0.9 }}>
+				{item.name} ha sido agregado al carrito
+			</span>
+		</div>,
+		{
+			position: 'top-left',
+			duration: 2000,
+			icon: false,
+			style: {
+				background: '#CE5C28',
+				color: 'rgba(255,255,255,0.95)',
+				fontFamily: 'Inter, sans-serif',
+				borderRadius: '12px',
+				border: 'none',
+				boxShadow: '0 4px 16px rgba(206,92,40,0.4)',
+				alignItems: 'flex-start',
+			},
+		}
+	);
 };
 
 const Menu = () => {
 	const [categories, setCategories] = useState([]);
 	const [menuItems, setMenuItems] = useState([]);
-	const [selectedCategoryId, setSelectedCategoryId] = useState(null);
+	const [selectedCategoryId, setSelectedCategoryId] = useState(PROMOS_CATEGORY_ID);
 	const [isSearchOpen, setIsSearchOpen] = useState(false);
 	const [searchTerm, setSearchTerm] = useState('');
 	const [isMobile, setIsMobile] = useState(false);
 
-	/* Logic for Swipe-based Category Selection */
-	const productListRef = useRef(null);
-	const touchStartX = useRef(0);
-	const touchEndX = useRef(0);
-
-
-
-	// Swipe handlers for product list
-	const handleTouchStart = (e) => {
-		touchStartX.current = e.touches[0].clientX;
-	};
-
-	const handleTouchMove = (e) => {
-		touchEndX.current = e.touches[0].clientX;
-	};
-
-	const handleTouchEnd = () => {
-		if (!touchStartX.current || !touchEndX.current) return;
-
-		const swipeDistance = touchStartX.current - touchEndX.current;
-		const minSwipeDistance = 50; // Minimum distance for a swipe
-
-		if (Math.abs(swipeDistance) > minSwipeDistance) {
-			const currentIndex = categories.findIndex(c => c.id === selectedCategoryId);
-
-			if (swipeDistance > 0) {
-				// Swiped left - go to previous category
-				const prevIndex = currentIndex === 0 ? categories.length - 1 : currentIndex - 1;
-				setSelectedCategoryId(categories[prevIndex].id);
-			} else {
-				// Swiped right - go to next category
-				const nextIndex = (currentIndex + 1) % categories.length;
-				setSelectedCategoryId(categories[nextIndex].id);
-			}
-		}
-
-		// Reset
-		touchStartX.current = 0;
-		touchEndX.current = 0;
-	};
 
 	// Detectar móvil
 	useEffect(() => {
@@ -104,6 +82,7 @@ const Menu = () => {
 	const setOrderData = useCartStore(state => state.setOrderData);
 	const setCustomerNameGlobal = useCartStore(state => state.setCustomerName);
 	const setCartOpen = useCartStore(state => state.setCartOpen);
+	const cartCount = useCartStore(state => state.cart.reduce((sum, i) => sum + i.qty, 0));
 
 	const handleCloseSuccess = () => {
 		setShowSuccess(false);
@@ -158,14 +137,17 @@ const Menu = () => {
 	const filteredItems = useMemo(() => {
 		let items = menuItems;
 
-		// Filter by category if not searching globally (or even if searching, usually scoped to cat or global? 
-		// Reference implies category view. I'll filter by category first unless searching.)
-		// But mobile apps usually search *all*. I'll keep it simple: Search overrides category, else show category.
+		// Search overrides category filter
 		if (searchTerm.trim()) {
 			return items.filter(item =>
 				item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
 				(item.description && item.description.toLowerCase().includes(searchTerm.toLowerCase()))
 			);
+		}
+
+		// Virtual Promociones category: show items with apply_promotions === 1
+		if (selectedCategoryId === PROMOS_CATEGORY_ID) {
+			return items.filter(item => item.apply_promotions === 1 || item.apply_promotions === true);
 		}
 
 		if (selectedCategoryId) {
@@ -179,48 +161,93 @@ const Menu = () => {
 
 	return (
 		<>
-			<Toaster richColors={false} position="top-center" />
-			{/* Max-width container for mobile - responsive */}
-			<div className="w-full sm:max-w-[480px] mx-auto">
+			<Toaster position="top-left" />
+			{/* Responsive container: full-width on tablet, centered on very wide screens */}
+			<div className="w-full max-w-[900px] mx-auto">
 				<div className="min-h-screen bg-white relative pb-[100px]">
 
 					{/* Custom Header */}
 					<header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md px-0 pt-6 pb-3 transition-all duration-300">
 						<div className="flex items-center justify-between mb-4 px-6">
-							<div className="flex flex-col">
-								<h1
-									style={{
-										fontFamily: 'Inter',
-										fontStyle: 'normal',
-										fontWeight: 400,
-										fontSize: '20px',
-										lineHeight: '24px',
-										color: '#CE5C28'
-									}}
-									className="text-left"
-								>
-									BIENVENIDO!
-								</h1>
+							<div className="flex flex-col" style={{ gap: '2px' }}>
 								<p
 									style={{
 										fontFamily: 'Inter',
-										fontStyle: 'normal',
-										fontWeight: 800,
-										fontSize: '16px',
-										lineHeight: '19px',
-										color: '#2C2C2C'
+										fontWeight: 400,
+										fontSize: '12px',
+										lineHeight: '15px',
+										color: '#ABABAB',
+										margin: 0,
 									}}
-									className="text-left"
+								>
+									Bienvenido
+								</p>
+								<h1
+									style={{
+										fontFamily: 'Inter',
+										fontWeight: 700,
+										fontSize: '22px',
+										lineHeight: '27px',
+										color: '#1A1A1A',
+										margin: 0,
+									}}
 								>
 									{customerName || 'Invitado'}
-								</p>
+								</h1>
 							</div>
 							<div className="flex items-center gap-3">
-								<BrownRounded
-									text="Carrito"
-									icon={`${process.env.PUBLIC_URL}/assets/icon_cart.svg`}
+								<InstallPWA />
+								<button
 									onClick={() => setCartOpen(true)}
-								/>
+									className="relative flex items-center gap-2 transition-all duration-200 active:scale-95"
+									style={{
+										background: '#E36414',
+										borderRadius: '25px',
+										border: 'none',
+										outline: 'none',
+										padding: '10px 16px',
+										minHeight: '40px',
+										cursor: 'pointer',
+									}}
+								>
+									{/* Badge — top-left corner of the button */}
+									{cartCount > 0 && (
+										<span
+											className="absolute flex items-center justify-center"
+											style={{
+												top: '-8px',
+												left: '-8px',
+												minWidth: '20px',
+												height: '20px',
+												padding: '0 5px',
+												background: '#000000',
+												borderRadius: '99px',
+												fontFamily: 'Inter, sans-serif',
+												fontWeight: 700,
+												fontSize: '10px',
+												lineHeight: '1',
+												color: '#FFFFFF',
+												border: '2px solid #FFFFFF',
+												zIndex: 10,
+											}}
+										>
+											{cartCount > 99 ? '99+' : cartCount}
+										</span>
+									)}
+									{/* Cart icon */}
+									<img
+										src={`${process.env.PUBLIC_URL}/assets/icon_cart.svg`}
+										alt="Carrito"
+										className="w-[18px] h-[18px]"
+										style={{ filter: 'brightness(0) invert(1)' }}
+									/>
+									<span style={{
+										fontFamily: 'Inter',
+										fontWeight: 400,
+										fontSize: '14px',
+										color: '#FFFFFF'
+									}}>Carrito</span>
+								</button>
 							</div>
 						</div>
 
@@ -245,16 +272,10 @@ const Menu = () => {
 					</header >
 
 					{/* Product List */}
-					< main
-						ref={productListRef}
-						className="px-3 py-4"
-						onTouchStart={handleTouchStart}
-						onTouchMove={handleTouchMove}
-						onTouchEnd={handleTouchEnd}
-					>
+					<main className="px-3 py-4">
 						{
 							filteredItems.length > 0 ? (
-								<div className="grid grid-cols-2 gap-2 justify-items-center">
+								<div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3">
 									{filteredItems.map(item => (
 										<ProductCardMenu
 											key={item.id}
@@ -265,6 +286,7 @@ const Menu = () => {
 											description={item.description}
 											atributo_1={item.atributo_1}
 											atributo_2={item.atributo_2}
+											apply_promotions={item.apply_promotions}
 											onAdd={addToCart}
 										/>
 									))}

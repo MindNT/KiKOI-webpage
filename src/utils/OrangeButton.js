@@ -15,8 +15,8 @@ const BrownButton = ({ onClick, disabled, children, type = "button", className =
                 font-sans font-normal text-[14px] sm:text-[16px] leading-[17px] sm:leading-[19px] text-center
                 transition-colors duration-200
                 ${disabled
-                    ? 'bg-[#CE5C28]/50 text-white/50 cursor-not-allowed'
-                    : 'bg-[#CE5C28] text-[#FFFFFF] active:opacity-90 hover:opacity-95'
+                    ? 'bg-[#E36414]/50 text-white/50 cursor-not-allowed'
+                    : 'bg-[#E36414] text-[#FFFFFF] active:opacity-90 hover:opacity-95'
                 }
                 ${className}
             `}

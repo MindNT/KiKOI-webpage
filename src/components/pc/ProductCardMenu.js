@@ -3,6 +3,7 @@ import { useCartStore } from '../../cartStore';
 import BrownRoundedSmall from '../../utils/OrangeRoundedSmall';
 import InfoButton from '../../utils/InfoButton';
 import ProductCardDescription from './ProductCardDescription';
+import DiscountTag from '../../utils/DiscountTag';
 
 /**
  * ProductCardMenu - Compact card for menu display
@@ -16,7 +17,7 @@ import ProductCardDescription from './ProductCardDescription';
  * - atributo_2: string
  * - onAdd: function (callback for add to cart)
  */
-const ProductCardMenu = ({ id, name, price, img, description, atributo_1, atributo_2, onAdd }) => {
+const ProductCardMenu = ({ id, name, price, img, description, atributo_1, atributo_2, apply_promotions, onAdd }) => {
     const [showModal, setShowModal] = useState(false);
     const storeOpen = useCartStore(state => state.storeOpen);
 
@@ -33,123 +34,102 @@ const ProductCardMenu = ({ id, name, price, img, description, atributo_1, atribu
 
     return (
         <>
+            {/* Card: fills full grid column width, fixed aspect ratio */}
             <div
                 onClick={handleCardClick}
-                className="relative bg-[#F5F5F5] overflow-hidden cursor-pointer"
+                className="relative bg-[#F5F5F5] overflow-hidden cursor-pointer w-full"
                 style={{
-                    width: '165px',
-                    height: '224px',
+                    aspectRatio: '165 / 224',
                     boxSizing: 'border-box',
-                    border: '1px solid #F5F5F5',
-                    borderRadius: '10px'
+                    border: 'none',
+                    borderRadius: '14px',
+                    minWidth: 0
                 }}
             >
-                {/* Info Button (Top Left) */}
+                {/* Info Button — top left */}
                 <div className="absolute" style={{ top: '8px', left: '8px', zIndex: 20 }}>
                     <InfoButton onClick={handleCardClick} />
                 </div>
 
-                {/* Product Image */}
-                <div 
+                {/* Discount Tag — top right, only when apply_promotions === 1 */}
+                {(apply_promotions === 1 || apply_promotions === true) && (
+                    <div className="absolute" style={{ top: '8px', right: '8px', zIndex: 20 }}>
+                        <DiscountTag />
+                    </div>
+                )}
+
+                {/* Product Image — upper center, ~55% of card */}
+                <div
                     className="absolute z-10 flex items-center justify-center pointer-events-none"
-                    style={{ 
-                        width: '133px', 
-                        height: '80px', 
-                        top: '40px', 
-                        left: '16px' 
+                    style={{
+                        width: '88%',
+                        height: '52%',
+                        top: '9%',
+                        left: '6%'
                     }}
                 >
                     <img
                         src={img}
                         alt={name}
                         className="w-full h-full object-contain"
-                        style={{ transform: 'scale(1.2)' }}
                     />
                 </div>
 
-                {/* Content Section (Bottom) */}
-                <div 
+                {/* Bottom section: name + price left, add button right */}
+                <div
                     className="absolute"
                     style={{
-                        width: '151px',
-                        height: '73px',
-                        left: '7px',
-                        bottom: '7px',
-                        background: '#F5F5F5',
-                        borderRadius: '8px',
+                        left: '10px',
+                        right: '10px',
+                        bottom: '10px',
                         display: 'flex',
-                        flexDirection: 'column',
+                        flexDirection: 'row',
+                        alignItems: 'flex-end',
                         justifyContent: 'space-between',
-                        padding: '4px'
+                        gap: '4px'
                     }}
                 >
-                    <div className="flex flex-col relative z-20 pointer-events-none">
-                        {/* Product Name */}
+                    {/* Left: Name then Price, tightly stacked */}
+                    <div
+                        className="pointer-events-none"
+                        style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: '1px' }}
+                    >
                         <h3
-                            className="truncate text-left"
+                            className="truncate text-left w-full"
                             style={{
                                 fontFamily: 'Inter, sans-serif',
                                 fontWeight: 700,
-                                fontSize: '16px',
-                                lineHeight: '19px',
-                                color: '#2C2C2C',
-                                margin: 0,
-                                width: '130px'
+                                fontSize: 'clamp(12px, 3.6vw, 16px)',
+                                lineHeight: '1.2',
+                                color: '#1A1A1A',
+                                margin: 0
                             }}
                         >
                             {name}
                         </h3>
-
-                        {/* Subtitle / Attributes */}
-                        <p
-                            className="truncate text-left mt-[2px]"
-                            style={{
-                                fontFamily: 'Inter, sans-serif',
-                                fontWeight: 400,
-                                fontSize: '12px',
-                                lineHeight: '15px',
-                                color: '#535353',
-                                margin: 0,
-                                width: '130px'
-                            }}
-                        >
-                            {[atributo_1, atributo_2].filter(Boolean).join(', ') || name}
-                        </p>
-                    </div>
-
-                    <div className="flex items-end justify-between w-full h-full relative z-20">
-                        {/* Price */}
                         <span
-                            className="pointer-events-none"
                             style={{
                                 fontFamily: 'Inter, sans-serif',
-                                fontWeight: 700,
-                                fontSize: '16px',
-                                lineHeight: '19px',
-                                color: '#969696',
-                                alignSelf: 'flex-end',
-                                marginBottom: '2px',
-                                marginLeft: '2px'
+                                fontWeight: 800,
+                                fontSize: 'clamp(15px, 4.5vw, 21px)',
+                                lineHeight: '1.1',
+                                color: '#CE5C28',
+                                display: 'block'
                             }}
                         >
                             ${price}
                         </span>
+                    </div>
 
-                        {/* Add Button */}
-                        <div 
-                            className="absolute pointer-events-auto" 
-                            style={{ 
-                                right: '-2px', 
-                                bottom: '-2px',
-                                width: '30px', 
-                                height: '30px' 
-                            }}
-                        >
-                            <BrownRoundedSmall
-                                onClick={handleAddClick}
-                                disabled={!storeOpen}
-                            />
-                        </div>
+                    {/* Right: Add button */}
+                    <div
+                        className="pointer-events-auto flex-shrink-0"
+                        style={{ width: '32px', height: '32px' }}
+                    >
+                        <BrownRoundedSmall
+                            onClick={handleAddClick}
+                            disabled={!storeOpen}
+                        />
                     </div>
                 </div>
             </div>
@@ -163,6 +143,7 @@ const ProductCardMenu = ({ id, name, price, img, description, atributo_1, atribu
                 description={description}
                 atributo_1={atributo_1}
                 atributo_2={atributo_2}
+                apply_promotions={apply_promotions}
                 isOpen={showModal}
                 onClose={() => setShowModal(false)}
                 onAdd={onAdd}
@@ -172,4 +153,3 @@ const ProductCardMenu = ({ id, name, price, img, description, atributo_1, atribu
 };
 
 export default ProductCardMenu;
-

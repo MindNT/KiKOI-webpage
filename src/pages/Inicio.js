@@ -98,7 +98,7 @@ const Inicio = () => {
 				<main className="flex-1 flex flex-col items-center justify-center px-6 relative">
 
 					{/* Title Text */}
-					<div className="absolute w-[314px] h-[86px] left-0 right-0 mx-auto top-[125px] font-['Inter'] font-[800] text-[36px] leading-[43px] flex flex-col items-center justify-center text-center text-[#2C2C2C] z-10">
+					<div className="mb-6 font-['Inter'] font-[800] text-[32px] leading-[38px] flex flex-col items-center justify-center text-center text-[#2C2C2C] z-10 w-full max-w-[314px]">
 						<span>
 							Ordena <span className="text-[#CE5C28]">mas rapido</span>
 						</span>
@@ -108,7 +108,7 @@ const Inicio = () => {
 					</div>
 
 					{/* Brand Image/Logo */}
-					<div className="mb-8 w-72 h-72 relative flex items-center justify-center">
+					<div className="mb-8 w-64 h-64 flex items-center justify-center flex-shrink-0">
 						<img
 							src={`${process.env.PUBLIC_URL}/images/landing.png`}
 							alt="KiKOI Logo"

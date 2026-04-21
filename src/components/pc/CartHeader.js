@@ -16,7 +16,7 @@ const CartHeader = ({ customerName, phoneNumber, onBack, onChangePhone }) => {
         <div
             className="relative px-6 py-6 sm:px-8 sm:py-8 rounded-b-3xl"
             style={{
-                background: '#D95A2B', // Or #CE5C28 depending on exact color match intended
+                background: '#E36414', // Or #CE5C28 depending on exact color match intended
                 boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.05)'
             }}
         >

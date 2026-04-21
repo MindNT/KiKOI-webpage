@@ -1,61 +1,53 @@
 import React from 'react';
 import { useLocation } from 'wouter';
 import WhiteRoundedReturn from '../utils/WhiteRoundedReturn';
-import Footer from '../components/pc/Footer';
 
 const Wallet = () => {
     const [, setLocation] = useLocation();
 
     return (
-        <div className="w-full sm:max-w-[480px] mx-auto min-h-screen bg-white relative pb-[100px] flex flex-col">
-            {/* Header Area (Orange Top exactly like ProductCardDescription) */}
-            <div 
-                className="relative px-6 py-6 sm:px-8 sm:py-8 rounded-b-3xl"
-                style={{
-                    background: '#CE5C28',
-                    minHeight: '120px'
-                }}
-            >
-                <div className="flex items-center justify-between mb-2">
-                    <WhiteRoundedReturn onClick={() => setLocation('/menu')} />
-                </div>
+        <div 
+            className="w-full sm:max-w-[640px] mx-auto min-h-screen flex flex-col relative"
+            style={{ background: '#CE5C28' }}
+        >
+            {/* Top Navigation Bar */}
+            <div className="px-6 py-6 sm:px-10 sm:py-10 w-full flex items-center">
+                <WhiteRoundedReturn onClick={() => setLocation('/menu')} />
+            </div>
+
+            {/* Main Content Area */}
+            <div className="flex-1 flex flex-col items-center justify-center px-6 pb-20 text-center">
                 
+                {/* Large Wallet Icon */}
+                <div className="mb-8 md:mb-12">
+                    <svg width="80" height="80" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="md:w-24 md:h-24">
+                        <path d="M4 4H14V14H4V4Z" stroke="#FFFFFF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                        <path d="M7 17H17V7" stroke="#FFFFFF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                        <path d="M14 14V20H4V14H14Z" stroke="#FFFFFF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                        <path d="M20 14V10H14V14H20Z" stroke="#FFFFFF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                        <path d="M17 17V20H20V17H17Z" stroke="#FFFFFF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                </div>
+
                 <h1 
-                    className="text-center mt-4"
+                    className="mb-2"
                     style={{
                         fontFamily: 'Inter',
-                        fontWeight: 700,
-                        fontSize: '24px',
+                        fontWeight: 800,
+                        fontSize: 'clamp(28px, 5vw, 42px)',
                         color: '#FFFFFF'
                     }}
                 >
                     KiKOI Wallet
                 </h1>
-            </div>
-
-            {/* Main Content Area */}
-            <div className="flex-1 flex flex-col items-center justify-center px-6 text-center">
-                <div 
-                    className="mb-8 flex items-center justify-center w-24 h-24 rounded-full"
-                    style={{ background: '#F5F5F5' }}
-                >
-                    {/* Placeholder Wallet Icon */}
-                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M4 4H14V14H4V4Z" stroke="#CE5C28" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                        <path d="M7 17H17V7" stroke="#CE5C28" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                        <path d="M14 14V20H4V14H14Z" stroke="#CE5C28" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                        <path d="M20 14V10H14V14H20Z" stroke="#CE5C28" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                        <path d="M17 17V20H20V17H17Z" stroke="#CE5C28" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    </svg>
-                </div>
 
                 <h2 
-                    className="mb-4"
+                    className="mb-6"
                     style={{
                         fontFamily: 'Inter',
-                        fontWeight: 700,
-                        fontSize: '28px',
-                        color: '#2C2C2C'
+                        fontWeight: 600,
+                        fontSize: 'clamp(18px, 3.5vw, 28px)',
+                        color: 'rgba(255, 255, 255, 0.9)'
                     }}
                 >
                     ¡Próximamente!
@@ -65,28 +57,26 @@ const Wallet = () => {
                     style={{
                         fontFamily: 'Inter',
                         fontWeight: 400,
-                        fontSize: '16px',
-                        lineHeight: '24px',
-                        color: '#535353'
+                        fontSize: 'clamp(14px, 2.5vw, 20px)',
+                        lineHeight: '1.6',
+                        color: 'rgba(255, 255, 255, 0.8)'
                     }}
                 >
                     Muy pronto podrás hacer uso de tus puntos acumulados en nuestra tienda para canjearlos por tus productos favoritos.
                 </p>
+                
                 <p 
-                    className="mt-4"
+                    className="mt-8"
                     style={{
                         fontFamily: 'Inter',
                         fontWeight: 600,
-                        fontSize: '16px',
-                        color: '#CE5C28'
+                        fontSize: '18px',
+                        color: '#FFFFFF'
                     }}
                 >
                     ¡Mantente al tanto!
                 </p>
             </div>
-
-            {/* Fixed Footer */}
-            <Footer />
         </div>
     );
 };

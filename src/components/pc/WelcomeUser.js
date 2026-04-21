@@ -20,7 +20,7 @@ const WelcomeUser = ({ customerName, onComplete }) => {
     return (
         <div
             className="min-h-screen flex items-center justify-center"
-            style={{ backgroundColor: '#CE5C28' }}
+            style={{ backgroundColor: '#E36414' }}
         >
             {/* Welcome Message */}
             <div className="text-center animate-pulse px-6">

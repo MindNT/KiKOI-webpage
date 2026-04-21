@@ -4,6 +4,31 @@ import { useCartStore } from '../../cartStore';
 import CartHeader from './CartHeader';
 import ProductCardCart from './ProductCardCart';
 import BrownRounded from '../../utils/OrangeCircle';
+import { toast } from 'sonner';
+
+// Helper: toast con título y subtexto
+const cartToast = (title, subtitle) => {
+    toast(
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+            <span style={{ fontWeight: 700, fontSize: '14px', lineHeight: '18px' }}>{title}</span>
+            <span style={{ fontWeight: 400, fontSize: '13px', lineHeight: '17px', opacity: 0.9 }}>{subtitle}</span>
+        </div>,
+        {
+            position: 'top-left',
+            duration: 2000,
+            icon: false,
+            style: {
+                background: '#CE5C28',
+                color: 'rgba(255,255,255,0.95)',
+                fontFamily: 'Inter, sans-serif',
+                borderRadius: '12px',
+                border: 'none',
+                boxShadow: '0 4px 16px rgba(206,92,40,0.4)',
+                alignItems: 'flex-start',
+            },
+        }
+    );
+};
 
 const Billingcar = () => {
     const [, setLocation] = useLocation();
@@ -153,8 +178,8 @@ const Billingcar = () => {
 
     return cartOpen ? (
         <div className="fixed inset-0 z-[100] bg-white">
-            {/* Max-width container for mobile - responsive */}
-            <div className="w-full sm:max-w-[480px] mx-auto h-full flex flex-col transform transition-transform duration-300">
+            {/* Responsive container: wider on tablets */}
+            <div className="w-full sm:max-w-[640px] md:max-w-full mx-auto h-full flex flex-col transform transition-transform duration-300">
 
                 {/* Header */}
                 <div className="bg-white flex-shrink-0">
@@ -269,7 +294,11 @@ const Billingcar = () => {
                                 item={item}
                                 onIncrease={() => updateQty(item.id, 1)}
                                 onDecrease={() => updateQty(item.id, -1)}
-                                onDelete={removeFromCart}
+                                onDelete={(id) => {
+                                    const deleted = cart.find(i => i.id === id);
+                                    removeFromCart(id);
+                                    if (deleted) cartToast('Eliminado', `${deleted.name} ha sido eliminado del carrito`);
+                                }}
                             />
                         ))
                     )}
@@ -284,7 +313,7 @@ const Billingcar = () => {
                                 <span
                                     style={{
                                         fontFamily: 'Inter',
-                                        fontSize: '16px',
+                                        fontSize: '14px',
                                         fontWeight: 400,
                                         color: '#2C2C2C'
                                     }}
@@ -294,7 +323,7 @@ const Billingcar = () => {
                                 <span
                                     style={{
                                         fontFamily: 'Inter',
-                                        fontSize: '16px',
+                                        fontSize: '14px',
                                         fontWeight: 400,
                                         color: '#2C2C2C'
                                     }}
@@ -306,7 +335,7 @@ const Billingcar = () => {
                                 <span
                                     style={{
                                         fontFamily: 'Inter',
-                                        fontSize: '16px',
+                                        fontSize: '14px',
                                         fontWeight: 400,
                                         color: '#2C2C2C'
                                     }}
@@ -316,7 +345,7 @@ const Billingcar = () => {
                                 <span
                                     style={{
                                         fontFamily: 'Inter',
-                                        fontSize: '16px',
+                                        fontSize: '14px',
                                         fontWeight: 400,
                                         color: '#2C2C2C'
                                     }}
@@ -328,7 +357,7 @@ const Billingcar = () => {
                                 <span
                                     style={{
                                         fontFamily: 'Inter',
-                                        fontSize: '16px',
+                                        fontSize: '14px',
                                         fontWeight: 400,
                                         color: '#2C2C2C'
                                     }}
@@ -338,7 +367,7 @@ const Billingcar = () => {
                                 <span
                                     style={{
                                         fontFamily: 'Inter',
-                                        fontSize: '16px',
+                                        fontSize: '14px',
                                         fontWeight: 400,
                                         color: '#2C2C2C'
                                     }}
@@ -350,7 +379,7 @@ const Billingcar = () => {
                                 <span
                                     style={{
                                         fontFamily: 'Inter',
-                                        fontSize: '18px',
+                                        fontSize: '16px',
                                         fontWeight: 700,
                                         color: '#2C2C2C'
                                     }}
@@ -360,7 +389,7 @@ const Billingcar = () => {
                                 <span
                                     style={{
                                         fontFamily: 'Inter',
-                                        fontSize: '18px',
+                                        fontSize: '16px',
                                         fontWeight: 700,
                                         color: '#2C2C2C'
                                     }}
@@ -371,6 +400,25 @@ const Billingcar = () => {
                         </div>
 
                         {/* Checkout Button */}
+                        {/* Clear cart button */}
+                        <button
+                            onClick={() => {
+                                clearCart();
+                                cartToast('Carrito vaciado', 'Se han eliminado todos los productos del carrito');
+                            }}
+                            className="w-full mb-3 py-2 rounded-full transition-all active:scale-95"
+                            style={{
+                                background: 'transparent',
+                                border: '1.5px solid #E0E0E0',
+                                fontFamily: 'Inter',
+                                fontWeight: 400,
+                                fontSize: '14px',
+                                color: '#969696',
+                                cursor: 'pointer',
+                            }}
+                        >
+                            Vaciar carrito
+                        </button>
                         <BrownRounded
                             text={isProcessing ? 'Procesando...' : 'Finalizar pedido'}
                             onClick={handleCheckout}

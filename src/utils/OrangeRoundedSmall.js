@@ -21,7 +21,7 @@ const BrownRoundedSmall = ({ onClick, disabled = false, className = "" }) => {
                 ${className}
             `}
             style={{
-                background: disabled ? '#CCCCCC' : '#CE5C28',
+                background: disabled ? '#CCCCCC' : '#E36414',
                 borderRadius: '25px',
                 border: 'none',
                 outline: 'none'

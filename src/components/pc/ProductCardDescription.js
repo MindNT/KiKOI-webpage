@@ -5,6 +5,7 @@ import WhiteRoundedReturn from '../../utils/WhiteRoundedReturn';
 import TagPrice from '../../utils/TagPrice';
 import AttributesTag from '../../utils/AttributesTag';
 import QuantitySelector from '../../utils/QuantitySelector';
+import DiscountTag from '../../utils/DiscountTag';
 
 /**
  * ProductCardDescription - Full product detail modal
@@ -20,7 +21,7 @@ import QuantitySelector from '../../utils/QuantitySelector';
  * - onClose: function
  * - onAdd: function (callback for add to cart)
  */
-const ProductCardDescription = ({ id, name, price, img, description, atributo_1, atributo_2, isOpen, onClose, onAdd }) => {
+const ProductCardDescription = ({ id, name, price, img, description, atributo_1, atributo_2, apply_promotions, isOpen, onClose, onAdd }) => {
 	const [quantity, setQuantity] = useState(1);
 	const storeOpen = useCartStore(state => state.storeOpen);
 
@@ -49,41 +50,47 @@ const ProductCardDescription = ({ id, name, price, img, description, atributo_1,
 	return (
 		<div className="fixed inset-0 z-[9999] bg-white flex flex-col">
 			{/* Max-width container for mobile - responsive */}
-			<div className="w-full sm:max-w-[480px] mx-auto h-full flex flex-col relative overflow-hidden">
-				
+			<div className="w-full sm:max-w-[480px] md:max-w-full mx-auto h-full flex flex-col relative overflow-hidden">
+
 				{/* Scrollable Content */}
 				<div className="flex-1 overflow-y-auto pb-32 pb-safe">
 					{/* Top Orange Section */}
-					<div className="w-full bg-[#CE5C28] rounded-b-[30px] pt-6 pb-8 flex flex-col items-center relative mb-6">
+					<div className="w-full bg-[#CE5C28] rounded-b-[30px] pt-6 pb-8 md:pb-12 flex flex-col items-center relative mb-6">
 						<div className="w-full flex justify-start px-4 sm:px-6 mb-2">
 							<WhiteRoundedReturn onClick={onClose} />
 						</div>
 						<img
 							src={img}
 							alt={name}
-							className="object-contain w-[240px] h-[240px] sm:w-[280px] sm:h-[280px]"
+							className="object-contain w-[240px] h-[240px] sm:w-[280px] sm:h-[280px] md:w-[380px] md:h-[380px]"
 							style={{
 								transform: 'scale(1.2)'
 							}}
 						/>
 					</div>
 
-					<div className="px-6">
-						{/* Product Name and Quantity Selector */}
+					<div className="px-6 md:px-10">
+						{/* Product Name, Promo Tag and Quantity Selector */}
 						<div className="flex items-start justify-between mb-4">
-							<h1
-								style={{
-									fontFamily: 'Inter',
-									fontStyle: 'normal',
-									fontWeight: 700,
-									fontSize: '24px',
-									lineHeight: '29px',
-									color: '#000000',
-									maxWidth: '60%'
-								}}
-							>
-								{name}
-							</h1>
+							<div style={{ maxWidth: '60%', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+								<h1
+									className="md:text-[30px] md:leading-[36px]"
+									style={{
+										fontFamily: 'Inter',
+										fontStyle: 'normal',
+										fontWeight: 700,
+										fontSize: '24px',
+										lineHeight: '29px',
+										color: '#000000',
+									}}
+								>
+									{name}
+								</h1>
+								{/* Promo badge below name */}
+								{(apply_promotions === 1 || apply_promotions === true) && (
+									<DiscountTag />
+								)}
+							</div>
 							<QuantitySelector
 								quantity={quantity}
 								onIncrease={handleIncrease}
@@ -94,7 +101,7 @@ const ProductCardDescription = ({ id, name, price, img, description, atributo_1,
 						{/* Description */}
 						{description && (
 							<p
-								className="mb-6"
+								className="mb-6 md:text-[16px] md:leading-[20px]"
 								style={{
 									fontFamily: 'Inter',
 									fontStyle: 'normal',
@@ -134,7 +141,7 @@ const ProductCardDescription = ({ id, name, price, img, description, atributo_1,
 				</div>
 
 				{/* Fixed Bottom Section */}
-				<div className="absolute bottom-0 left-0 right-0 bg-white px-6 py-4 pb-safe border-t border-gray-100 z-10">
+				<div className="absolute bottom-6 left-0 right-0 bg-white px-6 md:px-10 py-4 pb-safe z-10">
 					<div className="flex items-center justify-between">
 						{/* Total Price */}
 						<div className="flex flex-col">
@@ -149,13 +156,15 @@ const ProductCardDescription = ({ id, name, price, img, description, atributo_1,
 							}}>
 								Total
 							</span>
-							<span style={{
+							<span
+								className="md:text-[48px] md:leading-[56px]"
+								style={{
 								fontFamily: 'Inter',
 								fontStyle: 'normal',
 								fontWeight: 700,
 								fontSize: '40px',
 								lineHeight: '48px',
-								color: '#CE5C28'
+								color: '#E36414'
 							}}>
 								$ {parseFloat(price) * quantity}
 							</span>
@@ -165,11 +174,11 @@ const ProductCardDescription = ({ id, name, price, img, description, atributo_1,
 						<button
 							onClick={handleAddToCart}
 							disabled={!storeOpen}
-							className="flex items-center justify-center transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+							className="flex items-center justify-center transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed md:w-[200px] md:h-[56px]"
 							style={{
 								width: '153px',
 								height: '48px',
-								background: '#CE5C28',
+								background: '#E36414',
 								borderRadius: '25px',
 								border: 'none',
 								outline: 'none'

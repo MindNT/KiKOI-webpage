@@ -28,7 +28,7 @@ const BrownRounded = ({ onClick, disabled = false, text = "Agregar", icon, class
             style={{
                 width: isFullWidth ? '100%' : undefined,
                 height: undefined,
-                background: '#CE5C28',
+                background: '#E36414',
                 borderRadius: '25px',
                 border: 'none',
                 outline: 'none',
@@ -47,8 +47,8 @@ const BrownRounded = ({ onClick, disabled = false, text = "Agregar", icon, class
                     fontFamily: 'Inter',
                     fontStyle: 'normal',
                     fontWeight: 400,
-                    fontSize: '16px',
-                    lineHeight: '19px',
+                    fontSize: '14px',
+                    lineHeight: '17px',
                     color: '#FFFFFF',
                     textAlign: 'center'
                 }}

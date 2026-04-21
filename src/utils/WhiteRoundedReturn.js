@@ -10,10 +10,9 @@ const WhiteRoundedReturn = ({ onClick, className = "" }) => {
     return (
         <button
             onClick={onClick}
-            className={`flex items-center justify-center transition-all duration-200 active:scale-95 ${className}`}
+            className={`flex items-center justify-center transition-all duration-200 active:scale-95 px-4 ${className}`}
             style={{
-                width: '102px',
-                height: '32px',
+                height: '40px',
                 background: 'rgba(255, 255, 255, 0.2)',
                 borderRadius: '25px',
                 border: 'none',

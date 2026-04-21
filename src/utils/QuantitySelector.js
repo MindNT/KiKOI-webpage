@@ -20,7 +20,7 @@ const QuantitySelector = ({ quantity, onIncrease, onDecrease, className = "" }) 
                 style={{
                     width: '32px',
                     height: '32px',
-                    background: '#CE5C28',
+                    background: '#E36414',
                     borderRadius: '25px',
                     border: 'none',
                     outline: 'none'

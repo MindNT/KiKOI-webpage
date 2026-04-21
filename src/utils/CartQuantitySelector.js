@@ -19,7 +19,7 @@ const CartQuantitySelector = ({ quantity, onIncrease, onDecrease, className = ""
                 style={{
                     width: '32px',
                     height: '32px',
-                    background: '#CE5C28',
+                    background: '#E36414',
                     borderRadius: '25px',
                     border: 'none',
                     outline: 'none'
@@ -37,8 +37,7 @@ const CartQuantitySelector = ({ quantity, onIncrease, onDecrease, className = ""
                 style={{
                     width: '67px',
                     height: '32px',
-                    borderRadius: '25px',
-                    boxShadow: '0px 1px 3px rgba(0, 0, 0, 0.05)'
+                    borderRadius: '25px'
                 }}
             >
                 <span
@@ -63,7 +62,7 @@ const CartQuantitySelector = ({ quantity, onIncrease, onDecrease, className = ""
                 style={{
                     width: '32px',
                     height: '32px',
-                    background: '#CE5C28',
+                    background: '#E36414',
                     borderRadius: '25px',
                     border: 'none',
                     outline: 'none'
