@@ -21,13 +21,13 @@
       "purpose": "maskable"
     },
     {
-      "src": "logo512.png",
+      "src": "logo192.png",
       "type": "image/png",
       "sizes": "512x512",
       "purpose": "any"
     },
     {
-      "src": "logo512.png",
+      "src": "logo192.png",
       "type": "image/png",
       "sizes": "512x512",
       "purpose": "maskable"
@@ -38,7 +38,12 @@
   "orientation": "portrait-primary",
   "theme_color": "#CE5C28",
   "background_color": "#ffffff",
-  "categories": ["food", "coffee", "restaurant", "cafe"],
+  "categories": [
+    "food",
+    "coffee",
+    "restaurant",
+    "cafe"
+  ],
   "lang": "es-MX",
   "scope": "/KiKOI-webpage/",
   "id": "kikoi-cafeteria"
