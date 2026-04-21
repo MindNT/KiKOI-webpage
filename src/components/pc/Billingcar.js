@@ -48,6 +48,7 @@ const Billingcar = () => {
     const setGlobalPhoneNumber = useCartStore(state => state.setPhoneNumber);
 
     const [isProcessing, setIsProcessing] = useState(false);
+    const [orderType, setOrderType] = useState(null); // 'PickUp' | 'Sucursal'
 
     // Phone editing state
     const [isEditingPhone, setIsEditingPhone] = useState(false);
@@ -106,7 +107,7 @@ const Billingcar = () => {
                     items: items,
                     total_amount: cartTotal,
                     promotions: {},
-                    maps_url: ""
+                    maps_url: orderType || ""
                 }
             };
 
@@ -114,7 +115,7 @@ const Billingcar = () => {
                 phone: phone,
                 total_amount: cartTotal,
                 items: JSON.stringify(items),
-                maps_url: '',
+                maps_url: orderType || "",
                 promotions: '{}',
                 code_order: orderCode,
                 delivery_datetime: currentDate
@@ -399,32 +400,128 @@ const Billingcar = () => {
                             </div>
                         </div>
 
-                        {/* Checkout Button */}
-                        {/* Clear cart button */}
-                        <button
-                            onClick={() => {
-                                clearCart();
-                                cartToast('Carrito vaciado', 'Se han eliminado todos los productos del carrito');
-                            }}
-                            className="w-full mb-3 py-2 rounded-full transition-all active:scale-95"
-                            style={{
-                                background: 'transparent',
-                                border: '1.5px solid #E0E0E0',
-                                fontFamily: 'Inter',
-                                fontWeight: 400,
-                                fontSize: '14px',
-                                color: '#969696',
-                                cursor: 'pointer',
-                            }}
-                        >
-                            Vaciar carrito
-                        </button>
-                        <BrownRounded
-                            text={isProcessing ? 'Procesando...' : 'Finalizar pedido'}
-                            onClick={handleCheckout}
-                            disabled={isProcessing}
-                            className="w-full"
-                        />
+                        {/* Order Type Selection */}
+                        <div className="mb-6">
+                            <h4
+                                style={{
+                                    fontFamily: 'Inter',
+                                    fontSize: '15px',
+                                    fontWeight: 700,
+                                    color: '#2C2C2C',
+                                    marginBottom: '12px'
+                                }}
+                            >
+                                Tipo de orden
+                            </h4>
+                            <div className="flex gap-3">
+                                {/* Sucursal */}
+                                <button
+                                    onClick={() => setOrderType('Sucursal')}
+                                    className="flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-full transition-all duration-200 active:scale-95"
+                                    style={{
+                                        background: orderType === 'Sucursal' ? '#FFF3ED' : '#F5F5F5',
+                                        border: `1.5px solid ${orderType === 'Sucursal' ? '#E36414' : 'transparent'}`,
+                                        cursor: 'pointer',
+                                        outline: 'none',
+                                    }}
+                                >
+                                    <div
+                                        className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0"
+                                        style={{ background: orderType === 'Sucursal' ? '#E36414' : '#E0E0E0' }}
+                                    >
+                                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+                                            <path
+                                                d="M3 21h18M5 21V8l7-5 7 5v13M9 21v-5a2 2 0 012-2h2a2 2 0 012 2v5"
+                                                stroke={orderType === 'Sucursal' ? '#FFFFFF' : '#8B8B8B'}
+                                                strokeWidth="2.5"
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                            />
+                                        </svg>
+                                    </div>
+                                    <span
+                                        style={{
+                                            fontFamily: 'Inter',
+                                            fontSize: '13px',
+                                            fontWeight: orderType === 'Sucursal' ? 700 : 500,
+                                            color: orderType === 'Sucursal' ? '#E36414' : '#8B8B8B'
+                                        }}
+                                    >
+                                        En sucursal
+                                    </span>
+                                </button>
+
+                                {/* PickUp */}
+                                <button
+                                    onClick={() => setOrderType('PickUp')}
+                                    className="flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-full transition-all duration-200 active:scale-95"
+                                    style={{
+                                        background: orderType === 'PickUp' ? '#FFF3ED' : '#F5F5F5',
+                                        border: `1.5px solid ${orderType === 'PickUp' ? '#E36414' : 'transparent'}`,
+                                        cursor: 'pointer',
+                                        outline: 'none',
+                                    }}
+                                >
+                                    <div
+                                        className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0"
+                                        style={{ background: orderType === 'PickUp' ? '#E36414' : '#E0E0E0' }}
+                                    >
+                                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+                                            <path
+                                                d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
+                                                stroke={orderType === 'PickUp' ? '#FFFFFF' : '#8B8B8B'}
+                                                strokeWidth="2.5"
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                            />
+                                        </svg>
+                                    </div>
+                                    <span
+                                        style={{
+                                            fontFamily: 'Inter',
+                                            fontSize: '13px',
+                                            fontWeight: orderType === 'PickUp' ? 700 : 500,
+                                            color: orderType === 'PickUp' ? '#E36414' : '#8B8B8B'
+                                        }}
+                                    >
+                                        PickUp
+                                    </span>
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Actions */}
+                        <div className="flex gap-3 mb-2">
+                            {/* Clear cart button */}
+                            <button
+                                onClick={() => {
+                                    clearCart();
+                                    cartToast('Carrito vaciado', 'Se han eliminado todos los productos del carrito');
+                                }}
+                                className="py-3 px-6 rounded-[25px] transition-all active:scale-95 flex-shrink-0"
+                                style={{
+                                    background: 'transparent',
+                                    border: '1.5px solid #E0E0E0',
+                                    fontFamily: 'Inter',
+                                    fontWeight: 600,
+                                    fontSize: '14px',
+                                    color: '#969696',
+                                    cursor: 'pointer',
+                                }}
+                            >
+                                Vaciar
+                            </button>
+
+                            {/* Enviar Orden Button */}
+                            <div className="flex-1" style={{ opacity: (!orderType || isProcessing) ? 0.6 : 1, transition: 'opacity 0.2s' }}>
+                                <BrownRounded
+                                    text={isProcessing ? 'Procesando...' : 'Enviar orden'}
+                                    onClick={handleCheckout}
+                                    disabled={!orderType || isProcessing}
+                                    className="w-full"
+                                />
+                            </div>
+                        </div>
                     </div>
                 )}
             </div>
