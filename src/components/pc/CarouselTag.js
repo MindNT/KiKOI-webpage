@@ -75,15 +75,15 @@ const CarouselTag = ({ onCategoryChange, selectedCategoryId }) => {
 
                     if (tab.isPromo) {
                         if (isActive) {
-                            bg = '#D97706';
+                            bg = '#E11D48';
                             border = 'none';
                             color = '#FFFFFF';
                             fontWeight = 700;
-                            shadow = '0 3px 10px rgba(217, 119, 6, 0.4)';
+                            shadow = 'none';
                         } else {
-                            bg = 'rgba(217, 119, 6, 0.10)';
-                            border = '1.5px solid rgba(217, 119, 6, 0.35)';
-                            color = '#A85C00';
+                            bg = 'rgba(225, 29, 72, 0.10)';
+                            border = '1.5px solid rgba(225, 29, 72, 0.35)';
+                            color = '#BE123C';
                             fontWeight = 600;
                             shadow = 'none';
                         }
@@ -123,20 +123,12 @@ const CarouselTag = ({ onCategoryChange, selectedCategoryId }) => {
                         >
                             {/* Lightning icon — only for Promo tab */}
                             {tab.isPromo && (
-                                <svg
-                                    width="10"
-                                    height="13"
-                                    viewBox="0 0 11 14"
-                                    fill="none"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    style={{ flexShrink: 0 }}
-                                >
-                                    <path
-                                        d="M6.5 0.5L0.5 7.833H5L4.5 13.5L10.5 6.167H6L6.5 0.5Z"
-                                        fill={color}
-                                        strokeLinejoin="round"
-                                    />
-                                </svg>
+                                <img
+                                    src={`${process.env.PUBLIC_URL}/assets/disccount.svg`}
+                                    alt="Promo"
+                                    className="w-[14px] h-[14px] object-contain flex-shrink-0"
+                                    style={isActive ? { filter: 'brightness(0) invert(1)' } : {}}
+                                />
                             )}
                             <span
                                 className="whitespace-nowrap"

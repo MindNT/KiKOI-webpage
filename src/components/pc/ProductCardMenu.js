@@ -72,6 +72,7 @@ const ProductCardMenu = ({ id, name, price, img, description, atributo_1, atribu
                         src={img}
                         alt={name}
                         className="w-full h-full object-contain"
+                        style={{ filter: 'drop-shadow(0px 8px 12px rgba(0, 0, 0, 0.15))' }}
                     />
                 </div>
 

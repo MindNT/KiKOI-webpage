@@ -54,17 +54,18 @@ const ProductCardDescription = ({ id, name, price, img, description, atributo_1,
 
 				{/* Scrollable Content */}
 				<div className="flex-1 overflow-y-auto pb-32 pb-safe">
-					{/* Top Orange Section */}
-					<div className="w-full bg-[#CE5C28] rounded-b-[30px] pt-6 pb-8 md:pb-12 flex flex-col items-center relative mb-6">
+					{/* Top Image Section */}
+					<div className="w-full bg-white pt-6 pb-8 md:pb-12 flex flex-col items-center relative mb-6">
 						<div className="w-full flex justify-start px-4 sm:px-6 mb-2">
-							<WhiteRoundedReturn onClick={onClose} />
+							<ReturnButtonBrown onClick={onClose} />
 						</div>
 						<img
 							src={img}
 							alt={name}
 							className="object-contain w-[240px] h-[240px] sm:w-[280px] sm:h-[280px] md:w-[380px] md:h-[380px]"
 							style={{
-								transform: 'scale(1.2)'
+								transform: 'scale(1.2)',
+								filter: 'drop-shadow(0px 10px 20px rgba(0, 0, 0, 0.15))'
 							}}
 						/>
 					</div>
@@ -88,7 +89,7 @@ const ProductCardDescription = ({ id, name, price, img, description, atributo_1,
 								</h1>
 								{/* Promo badge below name */}
 								{(apply_promotions === 1 || apply_promotions === true) && (
-									<DiscountTag />
+									<DiscountTag style={{ alignSelf: 'flex-start' }} />
 								)}
 							</div>
 							<QuantitySelector
@@ -141,32 +142,34 @@ const ProductCardDescription = ({ id, name, price, img, description, atributo_1,
 				</div>
 
 				{/* Fixed Bottom Section */}
-				<div className="absolute bottom-6 left-0 right-0 bg-white px-6 md:px-10 py-4 pb-safe z-10">
+				<div 
+					className="absolute bottom-4 left-0 right-0 bg-white px-6 md:px-10 pt-3 pb-safe z-10 rounded-t-2xl"
+					style={{ boxShadow: '0 -10px 30px rgba(0,0,0,0.03)' }}
+				>
 					<div className="flex items-center justify-between">
 						{/* Total Price */}
 						<div className="flex flex-col">
 							<span style={{
-								fontFamily: 'Inter',
-								fontStyle: 'normal',
-								fontWeight: 400,
-								fontSize: '16px',
-								lineHeight: '19px',
-								color: '#000000',
-								marginBottom: '4px'
+								fontFamily: 'Inter, sans-serif',
+								fontWeight: 500,
+								fontSize: '12px',
+								lineHeight: '1.2',
+								color: '#969696',
+								marginBottom: '2px'
 							}}>
 								Total
 							</span>
 							<span
-								className="md:text-[48px] md:leading-[56px]"
+								className="md:text-[36px]"
 								style={{
-								fontFamily: 'Inter',
-								fontStyle: 'normal',
-								fontWeight: 700,
-								fontSize: '40px',
-								lineHeight: '48px',
-								color: '#E36414'
+								fontFamily: 'Inter, sans-serif',
+								fontWeight: 800,
+								fontSize: '30px',
+								lineHeight: '1',
+								letterSpacing: '-0.02em',
+								color: '#1A1A1A'
 							}}>
-								$ {parseFloat(price) * quantity}
+								<span className="text-[#E36414]">$</span>{parseFloat(price) * quantity}
 							</span>
 						</div>
 
@@ -174,22 +177,22 @@ const ProductCardDescription = ({ id, name, price, img, description, atributo_1,
 						<button
 							onClick={handleAddToCart}
 							disabled={!storeOpen}
-							className="flex items-center justify-center transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed md:w-[200px] md:h-[56px]"
+							className="flex items-center justify-center transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed md:w-[180px] md:h-[50px]"
 							style={{
-								width: '153px',
-								height: '48px',
+								width: '140px',
+								height: '44px',
 								background: '#E36414',
 								borderRadius: '25px',
 								border: 'none',
-								outline: 'none'
+								outline: 'none',
+								boxShadow: '0 4px 12px rgba(227, 100, 20, 0.25)'
 							}}
 						>
 							<span style={{
-								fontFamily: 'Inter',
-								fontStyle: 'normal',
-								fontWeight: 400,
-								fontSize: '16px',
-								lineHeight: '19px',
+								fontFamily: 'Inter, sans-serif',
+								fontWeight: 600,
+								fontSize: '15px',
+								letterSpacing: '0.01em',
 								color: '#FFFFFF'
 							}}>
 								Agregar

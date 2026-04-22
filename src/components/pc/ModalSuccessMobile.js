@@ -1,59 +1,73 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useLocation } from 'wouter';
 import WhiteRoundedReturn from '../../utils/WhiteRoundedReturn';
+import { useCartStore } from '../../cartStore';
 
 const ModalSuccessMobile = ({ isOpen, orderData, customerName, onClose }) => {
   const [, setLocation] = useLocation();
   const [preparationMessage, setPreparationMessage] = useState('');
 
+  const orderEndTime = useCartStore(state => state.orderEndTime);
+  const setOrderEndTime = useCartStore(state => state.setOrderEndTime);
+
   // Timer states
   const [timeLeft, setTimeLeft] = useState(null); // in seconds
   const timerRef = useRef(null);
+  const hasPlayedAudio = useRef(false);
 
   useEffect(() => {
     if (isOpen) {
-      // Play notification sound
-      const audio = new Audio(`${process.env.PUBLIC_URL}/sounds/new-notification-022-370046.mp3`);
-      audio.play().catch(error => console.log('Error playing sound:', error));
+      // Solo iniciar el proceso si es la primera vez que se abre el modal para este pedido
+      if (!hasPlayedAudio.current) {
+        // Play notification sound
+        const audio = new Audio(`${process.env.PUBLIC_URL}/sounds/new-notification-022-370046.mp3`);
+        audio.play().catch(error => console.log('Error playing sound:', error));
+        hasPlayedAudio.current = true;
 
-      // Fetch preparation time
-      fetch('https://kikoi-management.mindnt.com.mx/settings/preparation-time')
-        .then(response => response.json())
-        .then(data => {
-          if (data.status === 'success') {
-            const prepMinutes = parseInt(data.data.preparation_time, 10) || 15; // default 15
-            setTimeLeft(prepMinutes * 60);
-            setPreparationMessage(data.data.message);
-          }
-        })
-        .catch(error => {
-          console.error('Error fetching preparation time:', error);
-          setPreparationMessage('Tu pedido está siendo preparado en KiKOI.');
-          setTimeLeft(15 * 60); // Default fallback
-        });
+        // Fetch preparation time
+        fetch('https://kikoi-management.mindnt.com.mx/settings/preparation-time')
+          .then(response => response.json())
+          .then(data => {
+            if (data.status === 'success') {
+              const prepMinutes = parseInt(data.data.preparation_time, 10) || 15; // default 15
+              setOrderEndTime(Date.now() + prepMinutes * 60 * 1000);
+              setPreparationMessage(data.data.message);
+            }
+          })
+          .catch(error => {
+            console.error('Error fetching preparation time:', error);
+            setPreparationMessage('Tu pedido está siendo preparado en KiKOI.');
+            setOrderEndTime(Date.now() + 15 * 60 * 1000); // Default fallback
+          });
+      }
     } else {
-      // Clear timer if closed early
+      // Reiniciar flag cuando el modal se cierra para siguientes pedidos
+      hasPlayedAudio.current = false;
       if (timerRef.current) clearInterval(timerRef.current);
       setTimeLeft(null);
     }
-  }, [isOpen]);
+  }, [isOpen, setOrderEndTime]);
 
+  // Actualizar el estado local cada segundo leyendo del tiempo final global
   useEffect(() => {
-    if (timeLeft === null) return;
+    if (!isOpen || !orderEndTime) return;
 
-    if (timeLeft <= 0) {
-      clearInterval(timerRef.current);
-      onClose(); // Clean up success modal state
-      setLocation('/order-ready');
-      return;
-    }
+    const computeTimeLeft = () => {
+      const remaining = Math.floor((orderEndTime - Date.now()) / 1000);
+      if (remaining <= 0) {
+        setTimeLeft(0);
+        clearInterval(timerRef.current);
+      } else {
+        setTimeLeft(remaining);
+      }
+    };
 
-    timerRef.current = setInterval(() => {
-      setTimeLeft(prev => prev - 1);
-    }, 1000);
+    computeTimeLeft();
+    timerRef.current = setInterval(computeTimeLeft, 1000);
 
     return () => clearInterval(timerRef.current);
-  }, [timeLeft, setLocation, onClose]);
+  }, [isOpen, orderEndTime, setLocation, onClose]);
+
 
   const handleReturnToMenu = () => {
     onClose();

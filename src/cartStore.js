@@ -10,6 +10,8 @@ export const useCartStore = create((set, get) => ({
   orderData: null,
   customerName: '',
   phoneNumber: '',
+  orderEndTime: null,
+  setOrderEndTime: (time) => set({ orderEndTime: time }),
   // Estado para el status de la tienda
   storeOpen: true,
   setStoreOpen: (open) => set({ storeOpen: open }),

@@ -3,6 +3,7 @@ import Footer from '../components/pc/Footer';
 import Billingcar from '../components/pc/Billingcar';
 import ProductCardMenu from '../components/pc/ProductCardMenu';
 import ModalSuccessMobile from '../components/pc/ModalSuccessMobile';
+import DynamicIslandTimer from '../components/pc/DynamicIslandTimer';
 import BrownButton from '../utils/OrangeButton';
 import BrownRounded from '../utils/OrangeCircle';
 import OrangeRounded from '../utils/OrangeRounded';
@@ -164,6 +165,7 @@ const Menu = () => {
 			<Toaster position="top-left" />
 			{/* Responsive container: full-width on tablet, centered on very wide screens */}
 			<div className="w-full max-w-[900px] mx-auto">
+				<DynamicIslandTimer />
 				<div className="min-h-screen bg-white relative pb-[100px]">
 
 					{/* Custom Header */}

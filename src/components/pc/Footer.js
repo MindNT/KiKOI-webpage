@@ -46,39 +46,32 @@ const Footer = () => {
 
 	return (
 		<footer
-			className="w-full flex justify-center pb-safe pointer-events-none"
+			className="w-full flex justify-center pb-safe"
 			style={{
 				position: 'fixed',
 				bottom: 0,
 				left: 0,
 				zIndex: 1000,
 				background: '#FFFFFF',
-				paddingTop: '12px',
-				paddingBottom: '12px'
+				paddingTop: '8px',
+				paddingBottom: 'max(8px, env(safe-area-inset-bottom))',
+				borderTop: '1px solid rgba(0,0,0,0.04)',
+				boxShadow: '0 -4px 20px rgba(0,0,0,0.02)'
 			}}
 		>
-			{/* Pill Container */}
-			<div
-				className="pointer-events-auto flex justify-between items-center px-4"
-				style={{
-					width: 'min(90vw, 480px)',
-					height: '60px',
-					background: '#F5F5F5',
-					borderRadius: '100px',
-					boxShadow: '0 4px 12px rgba(0,0,0,0.05)'
-				}}
-			>
+			{/* Minimalist Container */}
+			<div className="flex justify-around items-center w-full max-w-[480px] px-6">
 				{navItems.map((item) => {
 					const active = item.path && isActive(item.path);
-					const color = active ? '#E36414' : '#B2B2B2';
+					const color = active ? '#E36414' : '#C4C4C4';
 
 					return (
 						<button
 							key={item.label}
 							onClick={item.action}
-							className="flex flex-col items-center justify-center p-2 focus:outline-none flex-1 transition-transform active:scale-95"
+							className="flex flex-col items-center justify-center px-2 py-1 focus:outline-none transition-transform active:scale-95"
 						>
-							<div className="flex items-center justify-center w-6 h-6 mb-[2px]">
+							<div className="flex items-center justify-center w-[22px] h-[22px] mb-[4px]">
 								{item.isWallet ? (
 									<WalletIcon color={color} />
 								) : (
@@ -88,24 +81,21 @@ const Footer = () => {
 										className="w-full h-full object-contain"
 										style={{
 											filter: active
-												? 'brightness(0) saturate(100%) invert(43%) sepia(87%) saturate(1458%) hue-rotate(346deg) brightness(97%) contrast(92%)' // #CE5C28
-												: 'brightness(0) saturate(100%) invert(80%) sepia(0%) saturate(83%) hue-rotate(152deg) brightness(96%) contrast(85%)'  // #B2B2B2
+												? 'brightness(0) saturate(100%) invert(43%) sepia(87%) saturate(1458%) hue-rotate(346deg) brightness(97%) contrast(92%)' // #E36414
+												: 'brightness(0) saturate(100%) invert(86%) sepia(1%) saturate(236%) hue-rotate(152deg) brightness(91%) contrast(85%)' // #C4C4C4
 										}}
 									/>
 								)}
 							</div>
 							<span
 								style={{
-									fontFamily: 'Inter',
-									fontStyle: 'normal',
-									fontWeight: 400,
-									fontSize: '14px',
-									lineHeight: '17px',
-									display: 'flex',
-									alignItems: 'center',
-									textAlign: 'center',
+									fontFamily: 'Inter, sans-serif',
+									fontWeight: active ? 600 : 500,
+									fontSize: '11px',
+									letterSpacing: '0.02em',
 									color: color,
-									transition: 'color 0.2s ease'
+									transition: 'all 0.2s ease',
+									marginTop: '2px'
 								}}
 							>
 								{item.label}

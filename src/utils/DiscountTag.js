@@ -18,29 +18,19 @@ const DiscountTag = ({ className = '', style = {} }) => {
                 alignItems: 'center',
                 gap: '4px',
                 padding: '3px 8px 3px 6px',
-                background: '#D97706',
+                background: '#E11D48',
                 borderRadius: '20px',
-                boxShadow: '0 2px 6px rgba(217, 119, 6, 0.35)',
+                boxShadow: 'none',
                 ...style,
             }}
         >
-            {/* Lightning bolt icon */}
-            <svg
-                width="11"
-                height="14"
-                viewBox="0 0 11 14"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-                style={{ flexShrink: 0 }}
-            >
-                <path
-                    d="M6.5 0.5L0.5 7.833H5L4.5 13.5L10.5 6.167H6L6.5 0.5Z"
-                    fill="white"
-                    stroke="rgba(255,255,255,0.3)"
-                    strokeWidth="0.3"
-                    strokeLinejoin="round"
-                />
-            </svg>
+            {/* Custom Icon */}
+            <img
+                src={`${process.env.PUBLIC_URL}/assets/disccount.svg`}
+                alt="Promo"
+                className="w-[12px] h-[12px] object-contain flex-shrink-0"
+                style={{ filter: 'brightness(0) invert(1)' }}
+            />
 
             {/* Label */}
             <span
