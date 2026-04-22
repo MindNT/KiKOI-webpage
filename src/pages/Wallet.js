@@ -8,8 +8,17 @@ const Wallet = () => {
     return (
         <div 
             className="w-full sm:max-w-[640px] mx-auto min-h-screen flex flex-col relative"
-            style={{ background: '#CE5C28' }}
+            style={{ 
+                background: '#CE5C28',
+                animation: 'walletFadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards'
+            }}
         >
+            <style>{`
+                @keyframes walletFadeIn {
+                    from { opacity: 0; transform: translateY(15px); }
+                    to { opacity: 1; transform: translateY(0); }
+                }
+            `}</style>
             {/* Top Navigation Bar */}
             <div className="px-6 py-6 sm:px-10 sm:py-10 w-full flex items-center">
                 <WhiteRoundedReturn onClick={() => setLocation('/menu')} />

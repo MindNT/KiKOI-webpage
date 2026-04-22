@@ -68,13 +68,13 @@ const DynamicIslandTimer = () => {
                 fontWeight: 500,
                 opacity: 0.95,
                 backdropFilter: 'blur(10px)',
-                animation: 'slideUp 0.3s ease-out forwards',
+                animation: 'slideUpIsland 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards',
                 cursor: isReady ? 'pointer' : 'default',
                 transition: 'background 0.5s ease, box-shadow 0.5s ease'
         }}>
             <style>{`
-                @keyframes slideUp {
-                    from { transform: translate(-50%, 20px); opacity: 0; }
+                @keyframes slideUpIsland {
+                    from { transform: translate(-50%, 30px); opacity: 0; }
                     to { transform: translate(-50%, 0); opacity: 0.95; }
                 }
                 @keyframes pulseIsland {

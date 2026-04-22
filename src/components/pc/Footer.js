@@ -1,11 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useLocation } from 'wouter';
 import { useCartStore } from '../../cartStore';
+import CloseSession from './CloseSession';
 
 const Footer = () => {
 	const [location, setLocation] = useLocation();
-	const setCartOpen = useCartStore(state => state.setCartOpen);
 	const cartOpen = useCartStore(state => state.cartOpen);
+	const [showCloseSession, setShowCloseSession] = useState(false);
 
 	if (cartOpen) return null;
 
@@ -23,12 +24,19 @@ const Footer = () => {
 		</svg>
 	);
 
+	const LogoutIcon = ({ color }) => (
+		<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+			<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+			<polyline points="16 17 21 12 16 7"></polyline>
+			<line x1="21" y1="12" x2="9" y2="12"></line>
+		</svg>
+	);
+
 	const navItems = [
 		{
-			label: 'Inicio',
-			path: '/',
-			icon: 'icon_home.svg',
-			action: () => setLocation('/')
+			label: 'Salir',
+			isLogout: true,
+			action: () => setShowCloseSession(true)
 		},
 		{
 			label: 'Menu',
@@ -74,6 +82,8 @@ const Footer = () => {
 							<div className="flex items-center justify-center w-[22px] h-[22px] mb-[4px]">
 								{item.isWallet ? (
 									<WalletIcon color={color} />
+								) : item.isLogout ? (
+									<LogoutIcon color={color} />
 								) : (
 									<img
 										src={`${process.env.PUBLIC_URL}/assets/${item.icon}`}
@@ -104,6 +114,11 @@ const Footer = () => {
 					);
 				})}
 			</div>
+			
+			<CloseSession 
+				isOpen={showCloseSession} 
+				onClose={() => setShowCloseSession(false)} 
+			/>
 		</footer>
 	);
 };

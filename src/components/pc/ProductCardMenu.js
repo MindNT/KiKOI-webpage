@@ -43,9 +43,16 @@ const ProductCardMenu = ({ id, name, price, img, description, atributo_1, atribu
                     boxSizing: 'border-box',
                     border: 'none',
                     borderRadius: '14px',
-                    minWidth: 0
+                    minWidth: 0,
+                    animation: 'cardFadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards'
                 }}
             >
+                <style>{`
+                    @keyframes cardFadeIn {
+                        from { opacity: 0; transform: translateY(15px); }
+                        to { opacity: 1; transform: translateY(0); }
+                    }
+                `}</style>
                 {/* Info Button — top left */}
                 <div className="absolute" style={{ top: '8px', left: '8px', zIndex: 20 }}>
                     <InfoButton onClick={handleCardClick} />

@@ -178,7 +178,16 @@ const Billingcar = () => {
     const total = subtotal + impuestos - descuentos;
 
     return cartOpen ? (
-        <div className="fixed inset-0 z-[100] bg-white">
+        <div 
+            className="fixed inset-0 z-[100] bg-white"
+            style={{ animation: 'cartSlideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards' }}
+        >
+            <style>{`
+                @keyframes cartSlideUp {
+                    from { transform: translateY(100%); }
+                    to { transform: translateY(0); }
+                }
+            `}</style>
             {/* Responsive container: wider on tablets */}
             <div className="w-full sm:max-w-[640px] md:max-w-full mx-auto h-full flex flex-col transform transition-transform duration-300">
 
