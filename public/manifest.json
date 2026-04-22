@@ -1,10 +1,10 @@
 {
   "short_name": "KiKOI",
   "name": "KiKOI - Cafetería y Postres",
-  "description": "La mejor cafetería con postres deliciosos, bebidas artesanales y un ambiente acogedor.",
+  "description": "Ordena en menos tiempo, disfruta más",
   "icons": [
     {
-      "src": "favicon.ico",
+      "src": "logo192.png",
       "sizes": "64x64 32x32 24x24 16x16",
       "type": "image/x-icon"
     },
