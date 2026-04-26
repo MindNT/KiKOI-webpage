@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 
 const fraccionamientosData = {
-    "45": ["Localidad 1", "Localidad 2"],
-    "50": ["Localidad 3", "Localidad 4"]
+    "35": ["Ciudad Caucel. Int"],
+    "40": ["Sian Ka'an 1", "Sian Ka'an 2", "Sian Ka'an 3", "Sian Ka'an 4", "Caucel pueblo", "Herradura Sur", "Yaxnah", "Piedra Norte", "Paraiso 4", "Paraiso 5", "Paraiso 6"],
+    "45": ["Santa Fe"],
 };
 
 const ModalDirection = ({ isOpen, onClose, onConfirm }) => {
@@ -10,11 +11,11 @@ const ModalDirection = ({ isOpen, onClose, onConfirm }) => {
     const [cost, setCost] = useState(0);
 
     const [formData, setFormData] = useState({
-        dir1: '',
-        dir2: '',
-        num: '',
         calle: '',
-        colonia: '',
+        num: '',
+        cruzamientos: '',
+        referencias: '',
+        telefono: '',
         quienRecibe: ''
     });
 
@@ -50,9 +51,20 @@ const ModalDirection = ({ isOpen, onClose, onConfirm }) => {
             alert('Selecciona un fraccionamiento.');
             return;
         }
-        const { dir1, dir2, num, calle, colonia, quienRecibe } = formData;
-        // Parsear por ","
-        const addressString = `${selectedFracc === 'otro' ? 'Otro' : selectedFracc},${dir1},${dir2},${num},${calle},${colonia},${quienRecibe},Costo de envio: $${cost}`;
+        const { calle, num, cruzamientos, referencias, telefono, quienRecibe } = formData;
+        
+        const addressParts = [];
+        const fraccStr = selectedFracc === 'otro' ? 'Otro' : selectedFracc;
+        addressParts.push(`Fraccionamiento: ${fraccStr}`);
+        if (calle) addressParts.push(`Calle: ${calle.trim()}`);
+        if (num) addressParts.push(`Núm: ${num.trim()}`);
+        if (cruzamientos) addressParts.push(`Cruzamientos: ${cruzamientos.trim()}`);
+        if (referencias) addressParts.push(`Referencias: ${referencias.trim()}`);
+        if (telefono) addressParts.push(`Teléfono de entrega: ${telefono.trim()}`);
+        if (quienRecibe) addressParts.push(`Recibe: ${quienRecibe.trim()}`);
+        
+        const addressString = addressParts.join(', ');
+        
         onConfirm(addressString, cost);
     };
 
@@ -65,15 +77,15 @@ const ModalDirection = ({ isOpen, onClose, onConfirm }) => {
                         to { transform: translateY(0); opacity: 1; }
                     }
                 `}</style>
-                
+
                 <h3 className="text-xl font-bold mb-4" style={{ fontFamily: 'Inter', color: '#2C2C2C' }}>
                     Dirección de envío a domicilio
                 </h3>
 
                 <div className="mb-4">
                     <label className="block mb-2 font-semibold text-sm" style={{ fontFamily: 'Inter', color: '#2C2C2C' }}>Fraccionamiento</label>
-                    <select 
-                        value={selectedFracc} 
+                    <select
+                        value={selectedFracc}
                         onChange={handleFraccChange}
                         className="w-full p-3 rounded-xl border border-gray-200 outline-none focus:border-[#E36414] transition-colors"
                         style={{ fontFamily: 'Inter' }}
@@ -99,17 +111,6 @@ const ModalDirection = ({ isOpen, onClose, onConfirm }) => {
                             </div>
                         )}
 
-                        <div className="grid grid-cols-2 gap-3">
-                            <div>
-                                <label className="block mb-1 text-xs font-semibold text-gray-600 uppercase">Dir 1</label>
-                                <input type="text" name="dir1" value={formData.dir1} onChange={handleChange} placeholder="Ej. Casa blanca" className="w-full p-3 rounded-xl border border-gray-200 outline-none focus:border-[#E36414]" />
-                            </div>
-                            <div>
-                                <label className="block mb-1 text-xs font-semibold text-gray-600 uppercase">Dir 2</label>
-                                <input type="text" name="dir2" value={formData.dir2} onChange={handleChange} placeholder="Ej. Portón negro" className="w-full p-3 rounded-xl border border-gray-200 outline-none focus:border-[#E36414]" />
-                            </div>
-                        </div>
-
                         <div className="grid grid-cols-3 gap-3">
                             <div className="col-span-2">
                                 <label className="block mb-1 text-xs font-semibold text-gray-600 uppercase">Calle</label>
@@ -122,24 +123,35 @@ const ModalDirection = ({ isOpen, onClose, onConfirm }) => {
                         </div>
 
                         <div>
-                            <label className="block mb-1 text-xs font-semibold text-gray-600 uppercase">Colonia</label>
-                            <input type="text" name="colonia" value={formData.colonia} onChange={handleChange} placeholder="Tu colonia" className="w-full p-3 rounded-xl border border-gray-200 outline-none focus:border-[#E36414]" />
+                            <label className="block mb-1 text-xs font-semibold text-gray-600 uppercase">Cruzamientos</label>
+                            <input type="text" name="cruzamientos" value={formData.cruzamientos} onChange={handleChange} placeholder="Ej. Entre calle 40 y 42" className="w-full p-3 rounded-xl border border-gray-200 outline-none focus:border-[#E36414]" />
                         </div>
 
                         <div>
-                            <label className="block mb-1 text-xs font-semibold text-gray-600 uppercase">Quien recibe</label>
-                            <input type="text" name="quienRecibe" value={formData.quienRecibe} onChange={handleChange} placeholder="Nombre completo" className="w-full p-3 rounded-xl border border-gray-200 outline-none focus:border-[#E36414]" />
+                            <label className="block mb-1 text-xs font-semibold text-gray-600 uppercase">Referencias</label>
+                            <input type="text" name="referencias" value={formData.referencias} onChange={handleChange} placeholder="Ej. Casa blanca con portón negro" className="w-full p-3 rounded-xl border border-gray-200 outline-none focus:border-[#E36414]" />
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-3">
+                            <div>
+                                <label className="block mb-1 text-xs font-semibold text-gray-600 uppercase">Quien recibe</label>
+                                <input type="text" name="quienRecibe" value={formData.quienRecibe} onChange={handleChange} placeholder="Nombre completo" className="w-full p-3 rounded-xl border border-gray-200 outline-none focus:border-[#E36414]" />
+                            </div>
+                            <div>
+                                <label className="block mb-1 text-xs font-semibold text-gray-600 uppercase">Teléfono de entrega</label>
+                                <input type="tel" name="telefono" value={formData.telefono} onChange={handleChange} placeholder="10 dígitos" className="w-full p-3 rounded-xl border border-gray-200 outline-none focus:border-[#E36414]" />
+                            </div>
                         </div>
 
                         <div className="flex gap-3 mt-6">
-                            <button 
+                            <button
                                 onClick={onClose}
                                 className="flex-1 py-3 rounded-full font-semibold border border-gray-200 text-gray-600 transition-colors hover:bg-gray-50"
                                 style={{ fontFamily: 'Inter' }}
                             >
                                 Cancelar
                             </button>
-                            <button 
+                            <button
                                 onClick={handleSubmit}
                                 className="flex-1 py-3 rounded-full font-bold text-white transition-transform active:scale-95"
                                 style={{ fontFamily: 'Inter', background: '#E36414', boxShadow: '0 4px 14px rgba(227, 100, 20, 0.3)' }}
@@ -149,9 +161,9 @@ const ModalDirection = ({ isOpen, onClose, onConfirm }) => {
                         </div>
                     </div>
                 )}
-                
+
                 {!selectedFracc && (
-                    <button 
+                    <button
                         onClick={onClose}
                         className="w-full py-3 mt-4 rounded-full font-semibold border border-gray-200 text-gray-600 transition-colors hover:bg-gray-50"
                         style={{ fontFamily: 'Inter' }}

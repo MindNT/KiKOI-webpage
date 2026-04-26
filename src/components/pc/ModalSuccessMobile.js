@@ -28,7 +28,8 @@ const ModalSuccessMobile = ({ isOpen, orderData, customerName, onClose }) => {
         if (orderData?.orderType === 'Domicilio') {
           setTimeout(() => {
             const itemsText = orderData.cartItems ? orderData.cartItems.map(item => `- ${item.qty}x ${item.name} ($${(item.price * item.qty).toFixed(2)})`).join('\n') : '';
-            const rawText = `*NUEVO PEDIDO A DOMICILIO* 🛵\n\n*Código de Orden:* ${orderData.orderCode}\n*Nombre:* ${customerName}\n*Teléfono:* ${orderData.phoneNumber}\n\n*Detalles del pedido:*\n${itemsText}\n\n*Costo de Envío:* $${orderData.envioCost ? orderData.envioCost.toFixed(2) : '0.00'}\n*Total a Pagar:* $${orderData.totalAmount ? orderData.totalAmount.toFixed(2) : '0.00'}\n\n*Dirección de Entrega:*\n${orderData.addressString || ''}`;
+            const addressFormatted = orderData.addressString ? '- ' + orderData.addressString.split(', ').join('\n- ') : '';
+            const rawText = `*NUEVO PEDIDO A DOMICILIO* 🛵\n\n*Código de Orden:* ${orderData.orderCode}\n*Nombre:* ${customerName}\n*Teléfono:* ${orderData.phoneNumber}\n\n*Detalles del pedido:*\n${itemsText}\n\n*Costo de Envío:* $${orderData.envioCost ? orderData.envioCost.toFixed(2) : '0.00'}\n*Total a Pagar:* $${orderData.totalAmount ? orderData.totalAmount.toFixed(2) : '0.00'}\n\n*Dirección de Entrega:*\n${addressFormatted}`;
             window.open(`https://wa.me/529991779519?text=${encodeURIComponent(rawText)}`, '_blank');
           }, 500); // Pequeño delay para asegurar que el modal se renderice antes de saltar
         }
@@ -136,7 +137,8 @@ const ModalSuccessMobile = ({ isOpen, orderData, customerName, onClose }) => {
               <button
                 onClick={() => {
                   const itemsText = orderData.cartItems ? orderData.cartItems.map(item => `- ${item.qty}x ${item.name} ($${(item.price * item.qty).toFixed(2)})`).join('\n') : '';
-                  const rawText = `*NUEVO PEDIDO A DOMICILIO* 🛵\n\n*Código de Orden:* ${orderData.orderCode}\n*Nombre:* ${customerName}\n*Teléfono:* ${orderData.phoneNumber}\n\n*Detalles del pedido:*\n${itemsText}\n\n*Costo de Envío:* $${orderData.envioCost ? orderData.envioCost.toFixed(2) : '0.00'}\n*Total a Pagar:* $${orderData.totalAmount ? orderData.totalAmount.toFixed(2) : '0.00'}\n\n*Dirección de Entrega:*\n${orderData.addressString || ''}`;
+                  const addressFormatted = orderData.addressString ? '- ' + orderData.addressString.split(', ').join('\n- ') : '';
+                  const rawText = `*NUEVO PEDIDO A DOMICILIO* 🛵\n\n*Código de Orden:* ${orderData.orderCode}\n*Nombre:* ${customerName}\n*Teléfono:* ${orderData.phoneNumber}\n\n*Detalles del pedido:*\n${itemsText}\n\n*Costo de Envío:* $${orderData.envioCost ? orderData.envioCost.toFixed(2) : '0.00'}\n*Total a Pagar:* $${orderData.totalAmount ? orderData.totalAmount.toFixed(2) : '0.00'}\n\n*Dirección de Entrega:*\n${addressFormatted}`;
                   window.open(`https://wa.me/529991779519?text=${encodeURIComponent(rawText)}`, '_blank');
                 }}
                 className="w-full py-3 rounded-full text-white font-bold transition-all active:scale-95 flex items-center justify-center gap-2"
