@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useCartStore } from '../../cartStore';
-import ReturnButtonBrown from '../../utils/OrangeReturnButton';
 import WhiteRoundedReturn from '../../utils/WhiteRoundedReturn';
 import TagPrice from '../../utils/TagPrice';
 import AttributesTag from '../../utils/AttributesTag';
@@ -57,7 +56,24 @@ const ProductCardDescription = ({ id, name, price, img, description, atributo_1,
 					{/* Top Image Section */}
 					<div className="w-full bg-white pt-6 pb-8 md:pb-12 flex flex-col items-center relative mb-6">
 						<div className="w-full flex justify-start px-4 sm:px-6 mb-2">
-							<ReturnButtonBrown onClick={onClose} />
+							<button
+								onClick={onClose}
+								className="flex items-center gap-2 transition-all duration-200 active:scale-95 shadow-sm"
+								style={{
+									background: '#E36414',
+									padding: '6px 16px 6px 12px',
+									borderRadius: '24px',
+									border: 'none',
+									outline: 'none',
+								}}
+							>
+								<svg width="18" height="18" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+									<path d="M15 10H5" stroke="#FFFFFF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+									<path d="M8 7L5 10" stroke="#FFFFFF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+									<path d="M8 13L5 10" stroke="#FFFFFF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+								</svg>
+								<span style={{ fontFamily: 'Inter', fontWeight: 600, fontSize: '14px', color: '#FFFFFF' }}>Menú</span>
+							</button>
 						</div>
 						<img
 							src={img}
@@ -143,7 +159,7 @@ const ProductCardDescription = ({ id, name, price, img, description, atributo_1,
 
 				{/* Fixed Bottom Section */}
 				<div 
-					className="absolute bottom-4 left-0 right-0 bg-white px-6 md:px-10 pt-3 pb-safe z-10 rounded-t-2xl"
+					className="absolute bottom-6 left-0 right-0 bg-white px-6 md:px-10 py-5 pb-safe z-10 rounded-t-2xl"
 					style={{ boxShadow: '0 -10px 30px rgba(0,0,0,0.03)' }}
 				>
 					<div className="flex items-center justify-between">
@@ -152,22 +168,22 @@ const ProductCardDescription = ({ id, name, price, img, description, atributo_1,
 							<span style={{
 								fontFamily: 'Inter, sans-serif',
 								fontWeight: 500,
-								fontSize: '12px',
+								fontSize: '13px',
 								lineHeight: '1.2',
 								color: '#969696',
-								marginBottom: '2px'
+								marginBottom: '4px'
 							}}>
 								Total
 							</span>
 							<span
-								className="md:text-[36px]"
+								className="md:text-[40px]"
 								style={{
 								fontFamily: 'Inter, sans-serif',
 								fontWeight: 800,
-								fontSize: '30px',
+								fontSize: '34px',
 								lineHeight: '1',
 								letterSpacing: '-0.02em',
-								color: '#1A1A1A'
+								color: '#E36414'
 							}}>
 								<span className="text-[#E36414]">$</span>{parseFloat(price) * quantity}
 							</span>
@@ -177,10 +193,10 @@ const ProductCardDescription = ({ id, name, price, img, description, atributo_1,
 						<button
 							onClick={handleAddToCart}
 							disabled={!storeOpen}
-							className="flex items-center justify-center transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed md:w-[180px] md:h-[50px]"
+							className="flex items-center justify-center transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed md:w-[190px] md:h-[54px]"
 							style={{
-								width: '140px',
-								height: '44px',
+								width: '146px',
+								height: '48px',
 								background: '#E36414',
 								borderRadius: '25px',
 								border: 'none',

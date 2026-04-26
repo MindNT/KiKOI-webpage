@@ -61,8 +61,8 @@ const Footer = () => {
 				left: 0,
 				zIndex: 1000,
 				background: '#FFFFFF',
-				paddingTop: '8px',
-				paddingBottom: 'max(8px, env(safe-area-inset-bottom))',
+				paddingTop: '12px',
+				paddingBottom: 'max(12px, env(safe-area-inset-bottom))',
 				borderTop: '1px solid rgba(0,0,0,0.04)',
 				boxShadow: '0 -4px 20px rgba(0,0,0,0.02)'
 			}}
@@ -77,7 +77,7 @@ const Footer = () => {
 						<button
 							key={item.label}
 							onClick={item.action}
-							className="flex flex-col items-center justify-center px-2 py-1 focus:outline-none transition-transform active:scale-95"
+							className="flex flex-col items-center justify-center px-2 py-2 focus:outline-none transition-transform active:scale-95"
 						>
 							<div className="flex items-center justify-center w-[22px] h-[22px] mb-[4px]">
 								{item.isWallet ? (

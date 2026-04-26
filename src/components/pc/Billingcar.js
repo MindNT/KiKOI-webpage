@@ -5,6 +5,7 @@ import CartHeader from './CartHeader';
 import ProductCardCart from './ProductCardCart';
 import BrownRounded from '../../utils/OrangeCircle';
 import { toast } from 'sonner';
+import ModalDirection from './ModalDirection';
 
 // Helper: toast con título y subtexto
 const cartToast = (title, subtitle) => {
@@ -48,7 +49,12 @@ const Billingcar = () => {
     const setGlobalPhoneNumber = useCartStore(state => state.setPhoneNumber);
 
     const [isProcessing, setIsProcessing] = useState(false);
-    const [orderType, setOrderType] = useState(null); // 'PickUp' | 'Sucursal'
+    const [orderType, setOrderType] = useState(null); // 'PickUp' | 'Sucursal' | 'Domicilio'
+    
+    // Delivery states
+    const [envioCost, setEnvioCost] = useState(0);
+    const [addressString, setAddressString] = useState('');
+    const [isDirectionModalOpen, setIsDirectionModalOpen] = useState(false);
 
     // Phone editing state
     const [isEditingPhone, setIsEditingPhone] = useState(false);
@@ -96,6 +102,9 @@ const Billingcar = () => {
             const orderCode = generateOrderCode();
             const items = formatItemsForAPI();
             const currentDate = new Date().toISOString();
+            
+            const totalAmountWithShipping = cartTotal + envioCost;
+            const finalMapsUrl = orderType === 'Domicilio' ? addressString : (orderType || "");
 
             const orderDataBody = {
                 data: {
@@ -105,17 +114,17 @@ const Billingcar = () => {
                     phone: phone,
                     sale_date: currentDate,
                     items: items,
-                    total_amount: cartTotal,
+                    total_amount: totalAmountWithShipping,
                     promotions: {},
-                    maps_url: orderType || ""
+                    maps_url: finalMapsUrl
                 }
             };
 
             const params = new URLSearchParams({
                 phone: phone,
-                total_amount: cartTotal,
+                total_amount: totalAmountWithShipping,
                 items: JSON.stringify(items),
-                maps_url: orderType || "",
+                maps_url: finalMapsUrl,
                 promotions: '{}',
                 code_order: orderCode,
                 delivery_datetime: currentDate
@@ -133,10 +142,13 @@ const Billingcar = () => {
                 const successData = {
                     ...result.data,
                     orderCode,
-                    totalAmount: cartTotal,
+                    totalAmount: totalAmountWithShipping,
                     phoneNumber: phone,
                     cartItems: [...cart],
-                    itemsCount: cart.length
+                    itemsCount: cart.length,
+                    orderType: orderType,
+                    addressString: finalMapsUrl,
+                    envioCost: envioCost
                 };
                 setOrderData(successData);
                 setShowSuccess(true);
@@ -175,7 +187,7 @@ const Billingcar = () => {
     const subtotal = cartTotal;
     const impuestos = 0.0;
     const descuentos = 0.0;
-    const total = subtotal + impuestos - descuentos;
+    const total = subtotal + impuestos + envioCost - descuentos;
 
     return cartOpen ? (
         <div 
@@ -385,6 +397,31 @@ const Billingcar = () => {
                                     $ {descuentos.toFixed(2)} MXN
                                 </span>
                             </div>
+                            
+                            {envioCost > 0 && (
+                                <div className="flex justify-between">
+                                    <span
+                                        style={{
+                                            fontFamily: 'Inter',
+                                            fontSize: '14px',
+                                            fontWeight: 600,
+                                            color: '#E36414'
+                                        }}
+                                    >
+                                        Costo de envío
+                                    </span>
+                                    <span
+                                        style={{
+                                            fontFamily: 'Inter',
+                                            fontSize: '14px',
+                                            fontWeight: 600,
+                                            color: '#E36414'
+                                        }}
+                                    >
+                                        $ {envioCost.toFixed(2)} MXN
+                                    </span>
+                                </div>
+                            )}
                             <div className="flex justify-between items-center pt-4 mt-4 border-t border-gray-100">
                                 <span
                                     style={{
@@ -425,8 +462,12 @@ const Billingcar = () => {
                             <div className="flex gap-3">
                                 {/* Sucursal */}
                                 <button
-                                    onClick={() => setOrderType('Sucursal')}
-                                    className="flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-full transition-all duration-200 active:scale-95"
+                                    onClick={() => {
+                                        setOrderType('Sucursal');
+                                        setEnvioCost(0);
+                                        setAddressString('');
+                                    }}
+                                    className="flex-1 flex flex-col items-center justify-center gap-1 py-3 px-2 rounded-2xl transition-all duration-200 active:scale-95"
                                     style={{
                                         background: orderType === 'Sucursal' ? '#FFF3ED' : '#F5F5F5',
                                         border: `1.5px solid ${orderType === 'Sucursal' ? '#E36414' : 'transparent'}`,
@@ -462,8 +503,12 @@ const Billingcar = () => {
 
                                 {/* PickUp */}
                                 <button
-                                    onClick={() => setOrderType('PickUp')}
-                                    className="flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-full transition-all duration-200 active:scale-95"
+                                    onClick={() => {
+                                        setOrderType('PickUp');
+                                        setEnvioCost(0);
+                                        setAddressString('');
+                                    }}
+                                    className="flex-1 flex flex-col items-center justify-center gap-1 py-3 px-2 rounded-2xl transition-all duration-200 active:scale-95"
                                     style={{
                                         background: orderType === 'PickUp' ? '#FFF3ED' : '#F5F5F5',
                                         border: `1.5px solid ${orderType === 'PickUp' ? '#E36414' : 'transparent'}`,
@@ -494,6 +539,50 @@ const Billingcar = () => {
                                         }}
                                     >
                                         PickUp
+                                    </span>
+                                </button>
+
+                                {/* A domicilio */}
+                                <button
+                                    onClick={() => setIsDirectionModalOpen(true)}
+                                    className="flex-1 flex flex-col items-center justify-center gap-1 py-3 px-2 rounded-2xl transition-all duration-200 active:scale-95"
+                                    style={{
+                                        background: orderType === 'Domicilio' ? '#FFF3ED' : '#F5F5F5',
+                                        border: `1.5px solid ${orderType === 'Domicilio' ? '#E36414' : 'transparent'}`,
+                                        cursor: 'pointer',
+                                        outline: 'none',
+                                    }}
+                                >
+                                    <div
+                                        className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0"
+                                        style={{ background: orderType === 'Domicilio' ? '#E36414' : '#E0E0E0' }}
+                                    >
+                                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+                                            <path 
+                                                d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" 
+                                                stroke={orderType === 'Domicilio' ? '#FFFFFF' : '#8B8B8B'} 
+                                                strokeWidth="2.5" 
+                                                strokeLinecap="round" 
+                                                strokeLinejoin="round"
+                                            />
+                                            <path 
+                                                d="M9 22V12h6v10" 
+                                                stroke={orderType === 'Domicilio' ? '#FFFFFF' : '#8B8B8B'} 
+                                                strokeWidth="2.5" 
+                                                strokeLinecap="round" 
+                                                strokeLinejoin="round"
+                                            />
+                                        </svg>
+                                    </div>
+                                    <span
+                                        style={{
+                                            fontFamily: 'Inter',
+                                            fontSize: '13px',
+                                            fontWeight: orderType === 'Domicilio' ? 700 : 500,
+                                            color: orderType === 'Domicilio' ? '#E36414' : '#8B8B8B'
+                                        }}
+                                    >
+                                        Domicilio
                                     </span>
                                 </button>
                             </div>
@@ -534,6 +623,18 @@ const Billingcar = () => {
                     </div>
                 )}
             </div>
+
+            {/* Modal for Direction */}
+            <ModalDirection 
+                isOpen={isDirectionModalOpen} 
+                onClose={() => setIsDirectionModalOpen(false)} 
+                onConfirm={(addressStr, cost) => {
+                    setAddressString(addressStr);
+                    setEnvioCost(cost);
+                    setOrderType('Domicilio');
+                    setIsDirectionModalOpen(false);
+                }}
+            />
         </div >
     ) : null;
 };
