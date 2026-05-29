@@ -27,7 +27,11 @@ const ModalSuccessMobile = ({ isOpen, orderData, customerName, onClose }) => {
         // Auto-open WhatsApp if Domicilio
         if (orderData?.orderType === 'Domicilio') {
           setTimeout(() => {
-            const itemsText = orderData.cartItems ? orderData.cartItems.map(item => `- ${item.qty}x ${item.name} ($${(item.price * item.qty).toFixed(2)})`).join('\n') : '';
+            const itemsText = orderData.cartItems ? orderData.cartItems.map(item => {
+              const vText = item.variants && item.variants.length > 0 ? ` (${item.variants.map(v => v.option).join(' · ')})` : '';
+              const unitPrice = item.finalPrice || item.price;
+              return `- ${item.qty}x ${item.name}${vText} ($${(unitPrice * item.qty).toFixed(2)})`;
+            }).join('\n') : '';
             const addressFormatted = orderData.addressString ? '- ' + orderData.addressString.split(', ').join('\n- ') : '';
             const rawText = `*NUEVO PEDIDO A DOMICILIO* 🛵\n\n*Código de Orden:* ${orderData.orderCode}\n*Nombre:* ${customerName}\n*Teléfono:* ${orderData.phoneNumber}\n\n*Detalles del pedido:*\n${itemsText}\n\n*Costo de Envío:* $${orderData.envioCost ? orderData.envioCost.toFixed(2) : '0.00'}\n*Total a Pagar:* $${orderData.totalAmount ? orderData.totalAmount.toFixed(2) : '0.00'}\n\n*Dirección de Entrega:*\n${addressFormatted}`;
             window.open(`https://wa.me/529991779519?text=${encodeURIComponent(rawText)}`, '_blank');
@@ -136,7 +140,11 @@ const ModalSuccessMobile = ({ isOpen, orderData, customerName, onClose }) => {
               </p>
               <button
                 onClick={() => {
-                  const itemsText = orderData.cartItems ? orderData.cartItems.map(item => `- ${item.qty}x ${item.name} ($${(item.price * item.qty).toFixed(2)})`).join('\n') : '';
+                  const itemsText = orderData.cartItems ? orderData.cartItems.map(item => {
+                    const vText = item.variants && item.variants.length > 0 ? ` (${item.variants.map(v => v.option).join(' · ')})` : '';
+                    const unitPrice = item.finalPrice || item.price;
+                    return `- ${item.qty}x ${item.name}${vText} ($${(unitPrice * item.qty).toFixed(2)})`;
+                  }).join('\n') : '';
                   const addressFormatted = orderData.addressString ? '- ' + orderData.addressString.split(', ').join('\n- ') : '';
                   const rawText = `*NUEVO PEDIDO A DOMICILIO* 🛵\n\n*Código de Orden:* ${orderData.orderCode}\n*Nombre:* ${customerName}\n*Teléfono:* ${orderData.phoneNumber}\n\n*Detalles del pedido:*\n${itemsText}\n\n*Costo de Envío:* $${orderData.envioCost ? orderData.envioCost.toFixed(2) : '0.00'}\n*Total a Pagar:* $${orderData.totalAmount ? orderData.totalAmount.toFixed(2) : '0.00'}\n\n*Dirección de Entrega:*\n${addressFormatted}`;
                   window.open(`https://wa.me/529991779519?text=${encodeURIComponent(rawText)}`, '_blank');
@@ -202,12 +210,17 @@ const ModalSuccessMobile = ({ isOpen, orderData, customerName, onClose }) => {
                     <div className="flex items-center space-x-3">
                       <div className="min-w-0 flex-1">
                         <div style={{ fontFamily: 'Inter', fontSize: '14px', fontWeight: 500, color: '#2C2C2C', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.name}</div>
-                        <div style={{ fontFamily: 'Inter', fontSize: '12px', color: '#6B7280' }}>${item.price} c/u</div>
+                        {item.variants && item.variants.length > 0 && (
+                          <div style={{ fontFamily: 'Inter', fontSize: '11px', color: '#969696', marginTop: '2px', marginBottom: '2px' }}>
+                            {item.variants.map(v => v.option).join(' · ')}
+                          </div>
+                        )}
+                        <div style={{ fontFamily: 'Inter', fontSize: '12px', color: '#6B7280' }}>${item.finalPrice || item.price} c/u</div>
                       </div>
                     </div>
                     <div className="text-right flex-shrink-0">
                       <div style={{ fontFamily: 'Inter', fontSize: '14px', fontWeight: 600, color: '#2C2C2C' }}>x{item.qty}</div>
-                      <div style={{ fontFamily: 'Inter', fontSize: '14px', fontWeight: 700, color: '#E36414' }}>${(item.price * item.qty).toFixed(2)}</div>
+                      <div style={{ fontFamily: 'Inter', fontSize: '14px', fontWeight: 700, color: '#E36414' }}>${((item.finalPrice || item.price) * item.qty).toFixed(2)}</div>
                     </div>
                   </div>
                 ))}
