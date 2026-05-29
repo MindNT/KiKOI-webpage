@@ -21,26 +21,36 @@ export const useCartStore = create((set, get) => ({
   setPhoneNumber: (phone) => set({ phoneNumber: phone }),
   addToCart: (item) => {
     const cart = get().cart;
-    const existing = cart.find(p => p.id === item.id);
+    
+    // Generate unique ID based on item.id + variants
+    const variantStr = item.variants && item.variants.length > 0 
+      ? JSON.stringify(item.variants.sort((a,b) => a.option.localeCompare(b.option))) 
+      : '';
+    const cartItemId = `${item.id}${variantStr ? '_' + variantStr : ''}`;
+    
+    const variantsPrice = (item.variants || []).reduce((sum, v) => sum + (v.price || 0), 0);
+    const finalPrice = item.price + variantsPrice;
+
+    const existing = cart.find(p => p.cartItemId === cartItemId);
     let newCart;
     if (existing) {
-      newCart = cart.map(p => p.id === item.id ? { ...p, qty: p.qty + 1 } : p);
+      newCart = cart.map(p => p.cartItemId === cartItemId ? { ...p, qty: p.qty + (item.qty || 1) } : p);
     } else {
-      newCart = [...cart, { ...item, qty: 1 }];
+      newCart = [...cart, { ...item, cartItemId, finalPrice, qty: item.qty || 1 }];
     }
-    const total = newCart.reduce((sum, i) => sum + i.price * i.qty, 0);
+    const total = newCart.reduce((sum, i) => sum + i.finalPrice * i.qty, 0);
     set({ cart: newCart, cartTotal: total });
   },
-  updateQty: (id, delta) => {
+  updateQty: (cartItemId, delta) => {
     const cart = get().cart
-      .map(item => item.id === id ? { ...item, qty: Math.max(1, item.qty + delta) } : item)
+      .map(item => item.cartItemId === cartItemId ? { ...item, qty: Math.max(1, item.qty + delta) } : item)
       .filter(item => item.qty > 0);
-    const total = cart.reduce((sum, i) => sum + i.price * i.qty, 0);
+    const total = cart.reduce((sum, i) => sum + i.finalPrice * i.qty, 0);
     set({ cart, cartTotal: total });
   },
-  removeFromCart: (id) => {
-    const cart = get().cart.filter(item => item.id !== id);
-    const total = cart.reduce((sum, i) => sum + i.price * i.qty, 0);
+  removeFromCart: (cartItemId) => {
+    const cart = get().cart.filter(item => item.cartItemId !== cartItemId);
+    const total = cart.reduce((sum, i) => sum + i.finalPrice * i.qty, 0);
     set({ cart, cartTotal: total });
   },
   clearCart: () => {

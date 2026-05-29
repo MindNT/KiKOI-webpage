@@ -36,9 +36,7 @@ const ProductCardDescription = ({ id, name, price, img, description, atributo_1,
 
 	const handleAddToCart = () => {
 		if (storeOpen && onAdd && quantity > 0) {
-			for (let i = 0; i < quantity; i++) {
-				onAdd({ id, name, price, img });
-			}
+			onAdd({ id, name, price, img, qty: quantity });
 			setQuantity(1); // Reset
 			onClose(); // Close modal
 		}

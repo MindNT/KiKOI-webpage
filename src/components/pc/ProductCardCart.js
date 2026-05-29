@@ -53,7 +53,7 @@ const ProductCardCart = ({ item, onIncrease, onDecrease, onDelete }) => {
                         </h3>
 
                         {/* Delete Button (Trash) positioned natively */}
-                        <div className="flex-shrink-0 cursor-pointer text-red-500" onClick={() => onDelete(item.id)}>
+                        <div className="flex-shrink-0 cursor-pointer text-red-500" onClick={() => onDelete(item.cartItemId || item.id)}>
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M6 19C6 20.1 6.9 21 8 21H16C17.1 21 18 20.1 18 19V7H6V19ZM19 4H15.5L14.5 3H9.5L8.5 4H5V6H19V4Z" fill="#ff0000" />
                             </svg>
@@ -72,7 +72,9 @@ const ProductCardCart = ({ item, onIncrease, onDecrease, onDelete }) => {
                             color: '#969696'
                         }}
                     >
-                        {item.description ? item.description : (item.atributo_1 || item.atributo_2 ? [item.atributo_1, item.atributo_2].filter(Boolean).join(', ') : 'Descripción del producto')}
+                        {item.variants && item.variants.length > 0
+                            ? item.variants.map(v => v.option).join(' · ')
+                            : (item.description ? item.description : (item.atributo_1 || item.atributo_2 ? [item.atributo_1, item.atributo_2].filter(Boolean).join(', ') : 'Descripción del producto'))}
                     </p>
 
                     {/* Bottom Row: Price and Quantity */}

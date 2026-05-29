@@ -50,7 +50,7 @@ const Billingcar = () => {
 
     const [isProcessing, setIsProcessing] = useState(false);
     const [orderType, setOrderType] = useState(null); // 'PickUp' | 'Sucursal' | 'Domicilio'
-    
+
     // Delivery states
     const [envioCost, setEnvioCost] = useState(0);
     const [addressString, setAddressString] = useState('');
@@ -64,7 +64,12 @@ const Billingcar = () => {
     const formatItemsForAPI = () => {
         const items = {};
         cart.forEach(item => {
-            items[item.id.toString()] = item.qty;
+            // Note: If you have variants, you might want to structure this differently for your backend!
+            // But since the API currently expects "id": "qty", we'll combine quantities of same ID
+            if (!items[item.id.toString()]) {
+                items[item.id.toString()] = 0;
+            }
+            items[item.id.toString()] += item.qty;
         });
         return items;
     };
@@ -102,7 +107,25 @@ const Billingcar = () => {
             const orderCode = generateOrderCode();
             const items = formatItemsForAPI();
             const currentDate = new Date().toISOString();
-            
+
+            // Format variants for backend
+            const variantsPayload = {};
+            cart.forEach(item => {
+                if (item.variants && item.variants.length > 0) {
+                    if (!variantsPayload[item.id.toString()]) {
+                        variantsPayload[item.id.toString()] = [];
+                    }
+                    item.variants.forEach(v => {
+                        const exists = variantsPayload[item.id.toString()].find(
+                            sv => sv.category === v.category && sv.option === v.option
+                        );
+                        if (!exists) {
+                            variantsPayload[item.id.toString()].push(v);
+                        }
+                    });
+                }
+            });
+
             const totalAmountWithShipping = cartTotal + envioCost;
             const finalMapsUrl = orderType === 'Domicilio' ? addressString : (orderType || "");
 
@@ -116,7 +139,8 @@ const Billingcar = () => {
                     items: items,
                     total_amount: totalAmountWithShipping,
                     promotions: {},
-                    maps_url: finalMapsUrl
+                    maps_url: finalMapsUrl,
+                    variants: Object.keys(variantsPayload).length > 0 ? variantsPayload : undefined
                 }
             };
 
@@ -129,6 +153,10 @@ const Billingcar = () => {
                 code_order: orderCode,
                 delivery_datetime: currentDate
             });
+
+            if (Object.keys(variantsPayload).length > 0) {
+                params.append('variants', JSON.stringify(variantsPayload));
+            }
 
             const response = await fetch(`https://kikoi-management.mindnt.com.mx/orders/save-order?${params}`, {
                 method: 'POST',
@@ -190,7 +218,7 @@ const Billingcar = () => {
     const total = subtotal + impuestos + envioCost - descuentos;
 
     return cartOpen ? (
-        <div 
+        <div
             className="fixed inset-0 z-[100] bg-white"
             style={{ animation: 'cartSlideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards' }}
         >
@@ -312,13 +340,13 @@ const Billingcar = () => {
                     ) : (
                         cart.map(item => (
                             <ProductCardCart
-                                key={item.id}
-                                item={item}
-                                onIncrease={() => updateQty(item.id, 1)}
-                                onDecrease={() => updateQty(item.id, -1)}
-                                onDelete={(id) => {
-                                    const deleted = cart.find(i => i.id === id);
-                                    removeFromCart(id);
+                                key={item.cartItemId}
+                                item={{ ...item, price: item.finalPrice || item.price }} // Pass final price to display
+                                onIncrease={() => updateQty(item.cartItemId, 1)}
+                                onDecrease={() => updateQty(item.cartItemId, -1)}
+                                onDelete={(cartItemId) => {
+                                    const deleted = cart.find(i => i.cartItemId === cartItemId);
+                                    removeFromCart(cartItemId);
                                     if (deleted) cartToast('Eliminado', `${deleted.name} ha sido eliminado del carrito`);
                                 }}
                             />
@@ -397,7 +425,7 @@ const Billingcar = () => {
                                     $ {descuentos.toFixed(2)} MXN
                                 </span>
                             </div>
-                            
+
                             {envioCost > 0 && (
                                 <div className="flex justify-between">
                                     <span
@@ -558,18 +586,18 @@ const Billingcar = () => {
                                         style={{ background: orderType === 'Domicilio' ? '#E36414' : '#E0E0E0' }}
                                     >
                                         <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
-                                            <path 
-                                                d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" 
-                                                stroke={orderType === 'Domicilio' ? '#FFFFFF' : '#8B8B8B'} 
-                                                strokeWidth="2.5" 
-                                                strokeLinecap="round" 
+                                            <path
+                                                d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"
+                                                stroke={orderType === 'Domicilio' ? '#FFFFFF' : '#8B8B8B'}
+                                                strokeWidth="2.5"
+                                                strokeLinecap="round"
                                                 strokeLinejoin="round"
                                             />
-                                            <path 
-                                                d="M9 22V12h6v10" 
-                                                stroke={orderType === 'Domicilio' ? '#FFFFFF' : '#8B8B8B'} 
-                                                strokeWidth="2.5" 
-                                                strokeLinecap="round" 
+                                            <path
+                                                d="M9 22V12h6v10"
+                                                stroke={orderType === 'Domicilio' ? '#FFFFFF' : '#8B8B8B'}
+                                                strokeWidth="2.5"
+                                                strokeLinecap="round"
                                                 strokeLinejoin="round"
                                             />
                                         </svg>
@@ -625,9 +653,9 @@ const Billingcar = () => {
             </div>
 
             {/* Modal for Direction */}
-            <ModalDirection 
-                isOpen={isDirectionModalOpen} 
-                onClose={() => setIsDirectionModalOpen(false)} 
+            <ModalDirection
+                isOpen={isDirectionModalOpen}
+                onClose={() => setIsDirectionModalOpen(false)}
                 onConfirm={(addressStr, cost) => {
                     setAddressString(addressStr);
                     setEnvioCost(cost);

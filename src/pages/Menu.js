@@ -10,6 +10,7 @@ import OrangeRounded from '../utils/OrangeRounded';
 import SearchBar from '../utils/searchbar';
 import CarouselTag, { PROMOS_CATEGORY_ID } from '../components/pc/CarouselTag';
 import InstallPWA from '../utils/InstallPWA';
+import ModalVariants from '../components/pc/ModalVariants';
 import { useCartStore } from '../cartStore';
 import { Toaster, toast } from 'sonner';
 
@@ -62,6 +63,11 @@ const Menu = () => {
 	const [isSearchOpen, setIsSearchOpen] = useState(false);
 	const [searchTerm, setSearchTerm] = useState('');
 	const [isMobile, setIsMobile] = useState(false);
+	const [selectedItemForVariants, setSelectedItemForVariants] = useState(null);
+
+	const handleAddToCartRequest = (item) => {
+		setSelectedItemForVariants({ ...item, qty: item.qty || 1 });
+	};
 
 
 	// Detectar móvil
@@ -289,7 +295,7 @@ const Menu = () => {
 											atributo_1={item.atributo_1}
 											atributo_2={item.atributo_2}
 											apply_promotions={item.apply_promotions}
-											onAdd={addToCart}
+											onAdd={handleAddToCartRequest}
 										/>
 									))}
 								</div>
@@ -317,6 +323,16 @@ const Menu = () => {
 						orderData={orderData}
 						customerName={customerName}
 						onClose={handleCloseSuccess}
+					/>
+
+					<ModalVariants
+						isOpen={!!selectedItemForVariants}
+						item={selectedItemForVariants}
+						onClose={() => setSelectedItemForVariants(null)}
+						onConfirm={(itemWithVariants) => {
+							setSelectedItemForVariants(null);
+							addToCart(itemWithVariants);
+						}}
 					/>
 
 				</div >
